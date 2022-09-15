@@ -1,0 +1,47 @@
+admin/.DS_Store
+admin/node_modules
+admin/dist
+
+
+# local env files
+admin/.env.local
+admin/.env.*.local
+
+# Log files
+admin/npm-debug.log*
+admin/yarn-debug.log*
+admin/yarn-error.log*
+admin/pnpm-debug.log*
+
+# Editor directories and files
+admin/.idea
+admin/.vscode
+admin/*.suo
+admin/*.ntvs*
+admin/*.njsproj
+admin/*.sln
+admin/*.sw?
+
+user/.DS_Store
+user/node_modules
+user/dist
+
+
+# local env files
+user/.env.local
+user/.env.*.local
+
+# Log files
+user/npm-debug.log*
+user/yarn-debug.log*
+user/yarn-error.log*
+user/pnpm-debug.log*
+
+# Editor directories and files
+user/.idea
+user/.vscode
+user/*.suo
+user/*.ntvs*
+user/*.njsproj
+user/*.sln
+user/*.sw?
