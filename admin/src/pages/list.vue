@@ -1,19 +1,11 @@
 <template>
     <div id="ListView">
         <el-tabs v-model="activeName" class="demo-tabs" @tab-change="handleClick">
-            <el-tab-pane label="我收的" name="0"></el-tab-pane>
-            <el-tab-pane label="我寄的" name="1"></el-tab-pane>
+            <el-tab-pane label="可揽件" name="0"></el-tab-pane>
+            <el-tab-pane label="我的揽件" name="1"></el-tab-pane>
         </el-tabs>
-        <div class="row">
-            <span class="sub-title">
-                快递单号
-            </span>
-            <el-input class="ipt" placeholder="请输入单号" />
-            <el-button type="primary">查询</el-button>
-        </div>
 
-
-        <el-table size="large" :data="tableData" style="width: 100%" max-height="300px">
+        <el-table v-if="showState == 0" size="large" :data="tableData" style="width: 100%" max-height="400px">
             <el-table-column fixed prop="recv" label="收件人" />
             <el-table-column prop="state" label="快递状态" />
             <el-table-column prop="number" label="快递单号" />
@@ -22,6 +14,26 @@
                 <template #default="scope">
                     <el-button link type="primary" size="small" @click.prevent="showdetail(scope.$index)">
                         详情
+                    </el-button>
+                    <el-button link type="primary" size="small" @click.prevent="showdetail(scope.$index)">
+                        揽件
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+
+        <el-table v-if="showState == 1" size="large" :data="myData" style="width: 100%" max-height="400px">
+            <el-table-column fixed prop="recv" label="收件人" />
+            <el-table-column prop="state" label="快递状态" />
+            <el-table-column prop="number" label="快递单号" />
+            <el-table-column prop="time" label="发货时间" />
+            <el-table-column fixed="right" label="操作">
+                <template #default="scope">
+                    <el-button link type="primary" size="small" @click.prevent="showdetail(scope.$index)">
+                        详情
+                    </el-button>
+                    <el-button link type="danger" size="small" @click.prevent="showdetail(scope.$index)">
+                        妥投
                     </el-button>
                 </template>
             </el-table-column>
@@ -37,7 +49,7 @@ export default {
             radio: '',
             poststate: '',
             sendtime: '',
-            type: 0,
+            showState: 0,
             options: [
                 {
                     value: '0',
@@ -122,14 +134,23 @@ export default {
                     state: '已发货',
                     number: '12312432',
                 },
+            ],
+            myData: [
+                {
+                    time: '2016-05-01',
+                    recv: 'Tom',
+                    state: '已发货',
+                    number: '12312432',
+                },
             ]
         }
     },
     methods: {
         handleClick(i) {
-            console.log(i)
+            this.showState = i;
         }
     },
+
 }
 </script>
 <style scoped>

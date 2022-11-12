@@ -3,42 +3,49 @@
     <el-container style="height: 100%;">
       <el-header id="header">
         <p id="logo">快递管家</p>
-        <el-menu id="menu-top" default-active="0" mode="horizontal" @select="handleSelect">
-          <el-menu-item index="0">打单发货</el-menu-item>
-          <el-menu-item index="1">物流跟踪</el-menu-item>
-          <el-menu-item index="2">我的账户</el-menu-item>
-        </el-menu>
-        <el-button text @click="centerDialogVisible = true">
+        <el-button text @click="centerDialogVisible = true" v-if="!iflogin">
           登录
         </el-button>
+        <span v-else>{{ username }}</span>
       </el-header>
       <el-container>
         <el-aside id="side">
-          <el-col>
-            <el-menu :default-active="activateSub">
-              <el-menu-item v-for="(item, i) in navigator[activate]" :key="i" :index="i" @click="routerGo(item.router)">
-                <span>{{ item.name }}</span>
-              </el-menu-item>
-            </el-menu>
-          </el-col>
+          <el-menu id="menu-top">
+            <router-link to="/insert"><el-menu-item index="0">寄快递</el-menu-item></router-link>
+            <router-link to="/list"><el-menu-item index="1">我的快递</el-menu-item></router-link>
+            <router-link to="/account"><el-menu-item index="2">我的账户</el-menu-item></router-link>
+          </el-menu>
         </el-aside>
 
         <el-main>
-          <router-view></router-view>
+          <router-view :changeIflogin="changeIflogin"></router-view>
         </el-main>
 
       </el-container>
     </el-container>
+
     <el-dialog v-model="centerDialogVisible" width="400px" align-center>
       <p class="login-title">登录</p>
       <el-input class="login-ipt" v-model="phone" clearable="true" placeholder="手机号" />
       <el-input class="login-ipt" v-model="password" type="password" clearable="true" placeholder="密码" />
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="centerDialogVisible = false">取消</el-button>
+          <el-button @click="centerRegisterVisible = true">前往注册</el-button>
           <el-button type="primary" @click="login">
             登录
           </el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="centerRegisterVisible" width="400px" align-center>
+      <p class="login-title">注册</p>
+      <el-input class="login-ipt" v-model="registerMes.phone" clearable="true" placeholder="手机号" />
+      <el-input class="login-ipt" v-model="registerMes.username" clearable="true" placeholder="账户名" />
+      <el-input class="login-ipt" v-model="registerMes.password" type="password" clearable="true" placeholder="密码" />
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="register">用户注册</el-button>
         </span>
       </template>
     </el-dialog>
@@ -46,17 +53,11 @@
 </template>
 
 <script>
-import { useRouter } from 'vue-router'
+import axios from 'axios'
 export default {
   name: 'App',
   components: {
 
-  },
-  watch: {
-    activate: function () {
-      let path = this.navigator[this.activate][0].router;
-      this.routerGo(path);
-    }
   },
   data() {
     return {
@@ -65,57 +66,61 @@ export default {
       centerDialogVisible: false,
       phone: '',
       password: '',
-      navigator: [[
-        {
-          name: '单个录入',
-          router: '/insert',
-          index: 0
-        },
-        {
-          name: '批量录入',
-          router: '/main',
-          index: 1
-        },
-      ], [
-        {
-          name: '订单列表',
-          router: '/list',
-          index: 0
-        },
-      ],
-      [
-        {
-          name: '账户信息',
-          router: '/account',
-          index: 0
-        },
-        {
-          name: '地址簿管理',
-          router: '/lists',
-          index: 1
-        },
-      ]]
+      iflogin: false,
+      username: '',
+      centerRegisterVisible: false,
+      registerMes: {
+        phone: '',
+        password: '',
+        username: ''
+      },
     }
   },
   methods: {
-    handleSelect(key) {
-      this.activate = key
+    changeIflogin(val) {
+      this.iflogin = val;
     },
     login() {
-      alert(1)
-    }
-  },
-  setup() {
-    const router = useRouter()
-    function routerGo(path) {
-      router.push({
-        path: path
+      const data = {
+        phone: this.phone,
+        password: this.password
+      }
+      console.log(data)
+      axios.post('todo', data).then(res => {
+        res = res.data;
+        if (res.state == 200) {
+          alert("登录成功！");
+          localStorage.cookie = res.cookie;
+          this.iflogin = true;
+          this.username = res.username;
+          this.centerDialogVisible = false;
+          window.location.reload()
+        }
       })
-    }
-    return {
-      routerGo
-    }
-  }
+    },
+    register() {
+      const data = {
+        username: this.registerMes.username,
+        password: this.registerMes.password,
+        phone: this.registerMes.phone,
+        type: "1",
+        net_point_id: "-1"
+      }
+      console.log(data);
+      alert("注册成功！");
+      this.centerRegisterVisible = false;
+      axios.post('todo', data).then(res => {
+        res = res.data;
+        if (res.state == 200) {
+          alert("注册成功！");
+          this.centerRegisterVisible = false;
+        }
+      })
+    },
+  },
+  created() {
+
+  },
 }
 </script>
 
@@ -149,6 +154,7 @@ export default {
 #header {
   display: flex;
   background-color: #dedede;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -169,7 +175,9 @@ export default {
 .el-menu {
   background-color: #dedede !important;
 }
-
+a{
+  text-decoration: none;
+}
 .login-title {
   font-size: 20px;
   text-align: center;

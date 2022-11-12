@@ -26,6 +26,12 @@
             <span>{{ staticPhone }}</span>
         </div>
         <div class="item">
+            <el-input :model="netpoint" style="display:inline-block;width: 200px;" placeholder="请输入网点号"></el-input>
+            <span class="title">
+                <el-button type="primary" @click="register">网点注册</el-button>
+            </span>
+        </div>
+        <div class="item">
             <span class="title">
                 <el-button type="danger" @click="exit">退出登录</el-button>
             </span>
@@ -52,6 +58,7 @@ export default {
     methods: {
         exit() {
             localStorage.cookie = null;
+            localStorage.type=null;
             this.changeIflogin(false);
             window.location.reload()
         }

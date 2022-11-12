@@ -1,8 +1,7 @@
 <template>
     <div id="ListView">
         <el-tabs v-model="activeName" class="demo-tabs" @tab-change="handleClick">
-            <el-tab-pane label="我收的" name="0"></el-tab-pane>
-            <el-tab-pane label="我寄的" name="1"></el-tab-pane>
+            <el-tab-pane label="网点快递" name="0"></el-tab-pane>
         </el-tabs>
         <div class="row">
             <span class="sub-title">
@@ -23,6 +22,12 @@
                     <el-button link type="primary" size="small" @click.prevent="showdetail(scope.$index)">
                         详情
                     </el-button>
+                    <el-button link type="primary" size="small" @click.prevent="showdetail(scope.$index)">
+                        指明下一网点
+                    </el-button>
+                    <el-button link type="primary" size="small" @click.prevent="showdetail(scope.$index)">
+                        确认送达
+                    </el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -34,24 +39,6 @@ export default {
     name: 'ListView',
     data() {
         return {
-            radio: '',
-            poststate: '',
-            sendtime: '',
-            type: 0,
-            options: [
-                {
-                    value: '0',
-                    label: '全部',
-                },
-                {
-                    value: '1',
-                    label: '未发货',
-                },
-                {
-                    value: '2',
-                    label: '已发货',
-                },
-            ],
             tableData: [
                 {
                     time: '2016-05-01',

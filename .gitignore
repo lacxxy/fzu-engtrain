@@ -45,3 +45,28 @@ user/*.ntvs*
 user/*.njsproj
 user/*.sln
 user/*.sw?
+
+
+point_admin/.DS_Store
+point_admin/node_modules
+point_admin/dist
+
+
+# local env files
+point_admin/.env.local
+point_admin/.env.*.local
+
+# Log files
+point_admin/npm-debug.log*
+point_admin/yarn-debug.log*
+point_admin/yarn-error.log*
+point_admin/pnpm-debug.log*
+
+# Editor directories and files
+point_admin/.idea
+point_admin/.vscode
+point_admin/*.suo
+point_admin/*.ntvs*
+point_admin/*.njsproj
+point_admin/*.sln
+point_admin/*.sw?

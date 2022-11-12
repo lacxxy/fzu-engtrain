@@ -11,8 +11,15 @@
       <el-container>
         <el-aside id="side">
           <el-menu id="menu-top">
-            <router-link to="/list"><el-menu-item index="0">我的快递</el-menu-item></router-link>
-            <router-link to="/account"><el-menu-item index="1">我的账户</el-menu-item></router-link>
+            <router-link to="/list">
+              <el-menu-item index="0">快递处理</el-menu-item>
+            </router-link>
+            <router-link to="/postManager">
+              <el-menu-item index="1">快递员管理</el-menu-item>
+            </router-link>
+            <router-link to="/account">
+              <el-menu-item index="2">我的账户</el-menu-item>
+            </router-link>
           </el-menu>
         </el-aside>
 
@@ -41,6 +48,8 @@
       <p class="login-title">注册</p>
       <el-input class="login-ipt" v-model="registerMes.phone" clearable="true" placeholder="手机号" />
       <el-input class="login-ipt" v-model="registerMes.username" clearable="true" placeholder="账户名" />
+      <el-input class="login-ipt" v-model="registerMes.name" clearable="true" placeholder="网点名称" />
+      <el-input class="login-ipt" v-model="registerMes.name" clearable="true" placeholder="详细地址" />
       <el-input class="login-ipt" v-model="registerMes.password" type="password" clearable="true" placeholder="密码" />
       <template #footer>
         <span class="dialog-footer">
@@ -68,10 +77,13 @@ export default {
       iflogin: false,
       username: '',
       centerRegisterVisible: false,
+      selectedOptions: [],
+      address: '',
       registerMes: {
         phone: '',
         password: '',
-        username: ''
+        username: '',
+        name: '',
       },
     }
   },
@@ -85,13 +97,11 @@ export default {
         password: this.password
       }
       console.log(data)
-      localStorage.type=1;
       axios.post('todo', data).then(res => {
         res = res.data;
         if (res.state == 200) {
           alert("登录成功！");
           localStorage.cookie = res.cookie;
-          localStorage.type=res.type;
           this.iflogin = true;
           this.username = res.username;
           this.centerDialogVisible = false;
@@ -104,8 +114,9 @@ export default {
         username: this.registerMes.username,
         password: this.registerMes.password,
         phone: this.registerMes.phone,
-        type: "2",
-        net_point_id: "-1"
+        name: this.registerMes.name,
+        address: this.address,
+        type: "3",
       }
       console.log(data);
       alert("注册成功！");
@@ -176,9 +187,11 @@ export default {
 .el-menu {
   background-color: #dedede !important;
 }
-a{
+
+a {
   text-decoration: none;
 }
+
 .login-title {
   font-size: 20px;
   text-align: center;
