@@ -11,8 +11,12 @@
       <el-container>
         <el-aside id="side">
           <el-menu id="menu-top">
-            <router-link to="/list"><el-menu-item index="0">我的快递</el-menu-item></router-link>
-            <router-link to="/account"><el-menu-item index="1">我的账户</el-menu-item></router-link>
+            <router-link to="/list">
+              <el-menu-item index="0">我的快递</el-menu-item>
+            </router-link>
+            <router-link to="/account">
+              <el-menu-item index="1">我的账户</el-menu-item>
+            </router-link>
           </el-menu>
         </el-aside>
 
@@ -55,8 +59,15 @@
 import axios from 'axios'
 export default {
   name: 'App',
-  components: {
-
+  mounted() {
+    axios.defaults.baseURL = 'http://10.133.1.102:8080/';
+    axios.interceptors.request.use(function (config) {
+      //let url = config.url.split('/').at(-1);
+      return config;
+    }, function (err) {
+      //请求错误之前可以进行处理
+      return Promise.reject(err)
+    });
   },
   data() {
     return {
@@ -85,17 +96,18 @@ export default {
         password: this.password
       }
       console.log(data)
-      localStorage.type=1;
-      axios.post('todo', data).then(res => {
+      axios.post('/user/login', data).then(res => {
         res = res.data;
         if (res.state == 200) {
           alert("登录成功！");
-          localStorage.cookie = res.cookie;
-          localStorage.type=res.type;
+          localStorage.cookie_admin = res.cookie;
+          localStorage.username_admin = res.username
           this.iflogin = true;
           this.username = res.username;
           this.centerDialogVisible = false;
           window.location.reload()
+        }else{
+          alert("登录失败！")
         }
       })
     },
@@ -107,10 +119,7 @@ export default {
         type: "2",
         net_point_id: "-1"
       }
-      console.log(data);
-      alert("注册成功！");
-      this.centerRegisterVisible = false;
-      axios.post('todo', data).then(res => {
+      axios.post('/user/register', data).then(res => {
         res = res.data;
         if (res.state == 200) {
           alert("注册成功！");
@@ -120,7 +129,10 @@ export default {
     },
   },
   created() {
-
+    if (localStorage.cookie_admin!='null'&&localStorage.cookie_admin) {
+      this.iflogin = true;
+      this.username = localStorage.username_admin;
+    }
   },
 }
 </script>
@@ -176,9 +188,11 @@ export default {
 .el-menu {
   background-color: #dedede !important;
 }
-a{
+
+a {
   text-decoration: none;
 }
+
 .login-title {
   font-size: 20px;
   text-align: center;

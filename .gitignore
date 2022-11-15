@@ -70,3 +70,27 @@ point_admin/*.ntvs*
 point_admin/*.njsproj
 point_admin/*.sln
 point_admin/*.sw?
+
+super_admin/.DS_Store
+super_admin/node_modules
+super_admin/dist
+
+
+# local env files
+super_admin/.env.local
+super_admin/.env.*.local
+
+# Log files
+super_admin/npm-debug.log*
+super_admin/yarn-debug.log*
+super_admin/yarn-error.log*
+super_admin/pnpm-debug.log*
+
+# Editor directories and files
+super_admin/.idea
+super_admin/.vscode
+super_admin/*.suo
+super_admin/*.ntvs*
+super_admin/*.njsproj
+super_admin/*.sln
+super_admin/*.sw?

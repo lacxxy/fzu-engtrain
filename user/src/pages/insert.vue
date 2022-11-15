@@ -73,6 +73,7 @@
 </template>
 <script>
 import { regionData, CodeToText } from 'element-china-area-data'
+import axios from 'axios'
 export default {
     name: 'InsertNew',
     data() {
@@ -115,6 +116,10 @@ export default {
             let recvl1 = CodeToText[this.selectedOptions[0]];
             let recvl2 = CodeToText[this.selectedOptions[1]];
             let recvl3 = CodeToText[this.selectedOptions[2]];
+            if (this.send.name == "" || this.addr == "" || this.addr1 == "" || this.recv.name == "") {
+                alert("无法为空");
+                return;
+            }
             const that = this;
             const data = {
                 cookie: localStorage.cookie,
@@ -128,7 +133,7 @@ export default {
                         l4: that.addr1
                     }
                 },
-                recieve: {
+                receive: {
                     name: that.recv.name,
                     phone: that.recv.phone,
                     area: {
@@ -139,7 +144,13 @@ export default {
                     }
                 },
             }
-            console.log(data);
+            axios.post('/user/sendParcel', data).then(res => {
+                res = res.data;
+                if (res.state == 200) {
+                    alert("寄出成功!");
+                    window.location.reload()
+                }
+            })
         }
     }
 }

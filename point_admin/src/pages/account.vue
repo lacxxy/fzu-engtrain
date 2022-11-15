@@ -3,58 +3,147 @@
         <div class="item">
             <span class="title">昵 称</span>
             <span>：</span>
-            <span>{{ username }}</span>
+            <span v-show="!editor.name" @click="editorChange(1)">{{ name }}</span>
+            <el-input ref="nameEdit" v-model="name" v-show="editor.name" style="width:200px" @blur="postChange(1)" />
         </div>
         <div class="item">
             <span class="title">手机号码</span>
             <span>：</span>
-            <span>{{ phone }}</span>
+            <span>{{ tel }}</span>
         </div>
         <div class="item">
             <span class="title">邮箱</span>
             <span>：</span>
-            <span>{{ email }}</span>
-        </div>
-        <div class="item">
-            <span class="title">公司</span>
-            <span>：</span>
-            <span>{{ company }}</span>
-        </div>
-        <div class="item">
-            <span class="title">固定电话</span>
-            <span>：</span>
-            <span>{{ staticPhone }}</span>
+            <span v-show="!editor.email" @click="editorChange(2)">{{ email }}</span>
+            <el-input ref="emailEdit" v-model="email" v-show="editor.email" style="width:200px" @blur="postChange(2)" />
         </div>
         <div class="item">
             <span class="title">
                 <el-button type="danger" @click="exit">退出登录</el-button>
             </span>
+            <span class="title">
+                <el-button @click="centerDialogVisible = true">修改密码</el-button>
+            </span>
         </div>
+        <el-dialog v-model="centerDialogVisible" width="400px" align-center>
+            <el-input v-model="pass.old" class="ipt" placeholder="旧密码" />
+            <el-input v-model="pass.new" class="ipt" placeholder="新密码" />
+            <el-button class="ipt" type="danger" @click="changePass">确认更改</el-button>
+        </el-dialog>
     </div>
 </template>
 <script>
-
+import axios from 'axios';
 export default {
     name: 'AccountMes',
     data() {
         return {
-            username: 'czh',
-            phone: '3112312311',
-            email: '1233534659@qq.com',
-            company: '福州大学',
-            staticPhone: '18897852',
-            netpoint: ''
+            email: "",
+            id_number: null,
+            name: "",
+            net_point_id: null,
+            password: "",
+            status: null,
+            tel: "",
+            type: null,
+            user_id: null,
+            prename: '',
+            preemail: '',
+            centerDialogVisible: false,
+            pass: {
+                old: '',
+                new: ''
+            },
+            editor: {
+                name: false,
+                email: false
+            }
         }
     },
     props: {
         changeIflogin: Function
     },
+    created() {
+        this.getMes()
+    },
     methods: {
         exit() {
-            localStorage.cookie = null;
+            localStorage.cookie_point = 'null';
             this.changeIflogin(false);
             window.location.reload()
-        }
+        },
+        getMes() {
+            const that = this;
+            axios.post('/user/getInfo', {
+                cookie: localStorage.cookie_point
+            }).then(res => {
+                res = res.data;
+                let obj = res.obj;
+                that.email = obj.email;
+                that.id_number = obj.id_number;
+                that.name = obj.name;
+                that.tel = obj.tel;
+            })
+        },
+        postChange(type) {
+            if (this.preemail == this.email && this.prename == this.name) {
+                this.editor.name = false;
+                this.editor.email = false;
+                return;
+            }
+            const d = {
+                cookie: localStorage.cookie_point,
+                type: type,
+                msg: type == 1 ? this.name : this.email
+            }
+            const that = this;
+            axios.post('/user/changeInfo', d).then(res => {
+                res = res.data;
+                if (res.state == 200) {
+                    alert("成功");
+                    that.prename = that.name;
+                    that.preemail = that.email;
+                }
+            }).catch(() => {
+                alert("错误！")
+                that.name = that.prename;
+                that.email = that.preemail;
+            })
+            this.editor.name = false;
+            this.editor.email = false;
+        },
+        editorChange(type) {
+            const that = this;
+            this.prename = this.name;
+            this.preemail = this.email;
+            if (type == 1) {
+                this.$nextTick(() => {
+                    that.editor.name = true
+                    that.$refs.nameEdit.focus()
+                });
+            }
+            else {
+                this.$nextTick(() => {
+                    that.editor.email = true
+                    that.$refs.emailEdit.focus()
+                });
+            }
+        },
+        changePass() {
+            const that = this;
+            const d = {
+                cookie: localStorage.cookie_point,
+                old_password: that.pass.old,
+                new_password: that.pass.new,
+            };
+            axios.post('/user/changePassword', d).then(res => {
+                res = res.data;
+                if (res.state == 200) {
+                    alert(res.msg);
+                    that.centerDialogVisible = false;
+                }
+            })
+        },
     }
 }
 </script>
@@ -80,5 +169,9 @@ span {
     margin-top: 20px;
     display: flex;
     align-items: center;
+}
+
+.ipt {
+    margin-top: 20px;
 }
 </style>

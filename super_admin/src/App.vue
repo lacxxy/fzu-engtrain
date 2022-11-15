@@ -11,11 +11,8 @@
       <el-container>
         <el-aside id="side">
           <el-menu id="menu-top">
-            <router-link to="/list">
-              <el-menu-item index="0">快递处理</el-menu-item>
-            </router-link>
             <router-link to="/postManager">
-              <el-menu-item index="1">快递员管理</el-menu-item>
+              <el-menu-item index="1">网点管理</el-menu-item>
             </router-link>
             <router-link to="/account">
               <el-menu-item index="2">我的账户</el-menu-item>
@@ -36,24 +33,9 @@
       <el-input class="login-ipt" v-model="password" type="password" clearable="true" placeholder="密码" />
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="centerRegisterVisible = true">前往注册</el-button>
           <el-button type="primary" @click="login">
             登录
           </el-button>
-        </span>
-      </template>
-    </el-dialog>
-
-    <el-dialog v-model="centerRegisterVisible" width="400px" align-center>
-      <p class="login-title">注册</p>
-      <el-input class="login-ipt" v-model="registerMes.phone" clearable="true" placeholder="手机号" />
-      <el-input class="login-ipt" v-model="registerMes.username" clearable="true" placeholder="账户名" />
-      <el-input class="login-ipt" v-model="registerMes.name" clearable="true" placeholder="网点名称" />
-      <el-input class="login-ipt" v-model="address" clearable="true" placeholder="详细地址" />
-      <el-input class="login-ipt" v-model="registerMes.password" type="password" clearable="true" placeholder="密码" />
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button type="primary" @click="register">用户注册</el-button>
         </span>
       </template>
     </el-dialog>
@@ -77,14 +59,6 @@ export default {
       return Promise.reject(err)
     });
   },
-  created() {
-    if (localStorage.cookie_point!='null') {
-      this.iflogin = true;
-      this.username = localStorage.username_point;
-    }else{
-      this.iflogin = false;
-    }
-  },
   data() {
     return {
       activate: 0,
@@ -94,7 +68,6 @@ export default {
       password: '',
       iflogin: false,
       username: '',
-      centerRegisterVisible: false,
       selectedOptions: [],
       address: '',
       registerMes: {
@@ -103,6 +76,14 @@ export default {
         username: '',
         name: '',
       },
+    }
+  },
+  created() {
+    if (localStorage.cookie_super != 'null' && localStorage.cookie_super) {
+      this.iflogin = true;
+      this.username = localStorage.username_super;
+    } else {
+      this.iflogin = false;
     }
   },
   methods: {
@@ -118,32 +99,14 @@ export default {
         res = res.data;
         if (res.state == 200) {
           alert("登录成功！");
-          localStorage.cookie_point = res.cookie;
+          localStorage.cookie_super = res.cookie;
           localStorage.username_point = res.username
           this.iflogin = true;
           this.username = res.username;
           this.centerDialogVisible = false;
           window.location.reload()
-        }else{
+        } else {
           alert(res.msg)
-        }
-      })
-    },
-    register() {
-      const data = {
-        username: this.registerMes.username,
-        password: this.registerMes.password,
-        phone: this.registerMes.phone,
-        name: this.registerMes.name,
-        address: this.address,
-        type: "3",
-      }
-      console.log(data);
-      axios.post('/user/register', data).then(res => {
-        res = res.data;
-        if (res.state == 200) {
-          alert("注册成功！");
-          this.centerRegisterVisible = false;
         }
       })
     },

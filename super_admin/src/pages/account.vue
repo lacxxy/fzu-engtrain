@@ -12,7 +12,7 @@
             <span>{{ tel }}</span>
         </div>
         <div class="item">
-            <span class="title" @click="editorChange(2)">邮 箱</span>
+            <span class="title">邮箱</span>
             <span>：</span>
             <span v-show="!editor.email" @click="editorChange(2)">{{ email }}</span>
             <el-input ref="emailEdit" v-model="email" v-show="editor.email" style="width:200px" @blur="postChange(2)" />
@@ -25,7 +25,6 @@
                 <el-button @click="centerDialogVisible = true">修改密码</el-button>
             </span>
         </div>
-
         <el-dialog v-model="centerDialogVisible" width="400px" align-center>
             <el-input v-model="pass.old" class="ipt" placeholder="旧密码" />
             <el-input v-model="pass.new" class="ipt" placeholder="新密码" />
@@ -40,9 +39,9 @@ export default {
     data() {
         return {
             email: "",
-            id_number: "",
+            id_number: null,
             name: "",
-            net_point_id: '',
+            net_point_id: -1,
             password: "",
             status: null,
             tel: "",
@@ -69,14 +68,14 @@ export default {
     },
     methods: {
         exit() {
-            localStorage.cookie = 'null';
+            localStorage.cookie_super = 'null';
             this.changeIflogin(false);
             window.location.reload()
         },
         getMes() {
             const that = this;
             axios.post('/user/getInfo', {
-                cookie: localStorage.cookie
+                cookie: localStorage.cookie_super
             }).then(res => {
                 res = res.data;
                 let obj = res.obj;
@@ -93,7 +92,7 @@ export default {
                 return;
             }
             const d = {
-                cookie: localStorage.cookie,
+                cookie: localStorage.cookie_super,
                 type: type,
                 msg: type == 1 ? this.name : this.email
             }
@@ -133,20 +132,19 @@ export default {
         changePass() {
             const that = this;
             const d = {
-                cookie: localStorage.cookie,
+                cookie: localStorage.cookie_super,
                 old_password: that.pass.old,
                 new_password: that.pass.new,
             };
             axios.post('/user/changePassword', d).then(res => {
                 res = res.data;
                 if (res.state == 200) {
-                    alert(res.msg+"请重新登录");
-                    that.centerDialogVisible = false;
-                }else{
                     alert(res.msg);
+                    that.centerDialogVisible = false;
+                    window.location.reload()
                 }
             })
-        }
+        },
     }
 }
 </script>
@@ -168,13 +166,13 @@ span {
     font-size: 20px;
 }
 
-.ipt {
-    margin-top: 20px;
-}
-
 .item {
     margin-top: 20px;
     display: flex;
     align-items: center;
+}
+
+.ipt {
+    margin-top: 20px;
 }
 </style>
