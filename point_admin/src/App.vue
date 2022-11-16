@@ -10,15 +10,15 @@
       </el-header>
       <el-container>
         <el-aside id="side">
-          <el-menu id="menu-top">
+          <el-menu id="menu-top" :default-active="$route.path" :router="true">
             <router-link to="/list">
-              <el-menu-item index="0">快递处理</el-menu-item>
+              <el-menu-item index="/list">快递处理</el-menu-item>
             </router-link>
             <router-link to="/postManager">
-              <el-menu-item index="1">快递员管理</el-menu-item>
+              <el-menu-item index="/postManager">快递员管理</el-menu-item>
             </router-link>
             <router-link to="/account">
-              <el-menu-item index="2">我的账户</el-menu-item>
+              <el-menu-item index="/account">我的账户</el-menu-item>
             </router-link>
           </el-menu>
         </el-aside>
@@ -68,7 +68,7 @@ export default {
 
   },
   mounted() {
-    axios.defaults.baseURL = 'http://10.133.1.102:8080/';
+    axios.defaults.baseURL = 'http://10.133.4.254:8080/';
     axios.interceptors.request.use(function (config) {
       //let url = config.url.split('/').at(-1);
       return config;

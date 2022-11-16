@@ -3,31 +3,29 @@
         <el-tabs v-model="activeName" class="demo-tabs" @tab-change="handleClick">
             <el-tab-pane label="网点待处理快递" name="0"></el-tab-pane>
         </el-tabs>
-        <!---
-        <div class="row">
-            <span class="sub-title">
-                快递单号
-            </span>
-            <el-input class="ipt" placeholder="请输入单号" />
-            <el-button type="primary">查询</el-button>
-        </div>
-        -->
 
         <el-table size="large" :data="tableData" style="width: 100%" max-height="300px">
             <el-table-column prop="status" :formatter="formatState" label="快递状态" />
-            <el-table-column prop="delivery_order_id" label="快递单号" />
+            <el-table-column prop="delivery_order_id" label="运单号" />
+            <el-table-column prop="package_order_id" label="快递单号" />
             <el-table-column prop="create_time" :formatter="formatTime" label="发货时间" />
             <el-table-column fixed="right" label="操作">
                 <template #default="scope">
                     <el-button link type="primary" size="small"
-                        @click.prevent="selectId = scope.$index; centerVisible = true">
+                        @click.prevent="selectId = scope.$index; getNext(scope.$index); centerVisible = true">
                         指明下一网点
                     </el-button>
                 </template>
             </el-table-column>
         </el-table>
 
-        <el-dialog v-model="centerVisible" width="400px" align-center>
+        <el-dialog v-model="centerVisible" width="600px" align-center>
+            <el-table size="large" :data="nextArr" style="width: 100%" max-height="300px">
+                <el-table-column prop="net_point_id_now" label="当前网点号" />
+                <el-table-column prop="net_point_id_next" label="下一网点号" />
+                <el-table-column prop="distance_from_now_to_next" label="当前网点到下一网点距离" />
+                <el-table-column prop="distance_from_next_to_des" label="下一网点到目标网点距离" />
+            </el-table>
             <el-input v-model="nextpoint" placeholder="输入下一网点号"></el-input>
             <el-button @click="submitNext" style="margin-top: 20px;">确定</el-button>
         </el-dialog>
@@ -44,15 +42,22 @@ export default {
             ],
             centerVisible: false,
             nextpoint: '',
-            selectId: null
+            selectId: null,
+            nextArr: [],
         }
     },
     created() {
         this.getDlv();
     },
     methods: {
-        handleClick(i) {
-            console.log(i)
+        getNext(i) {
+            const that = this;
+            axios.post('/netpoint/getDistanceInfo', {
+                delivery_order_id: that.tableData[i].delivery_order_id
+            }).then(res => {
+                res = res.data;
+                that.nextArr = res.objs;
+            })
         },
         getDlv() {
             const that = this;
@@ -98,16 +103,23 @@ export default {
         },
         submitNext() {
             const that = this;
+            if (that.nextpoint == '') {
+                alert("不能为空")
+                return;
+            }
             const d = {
                 delivery_order_id: that.tableData[that.selectId].delivery_order_id,
                 net_point_id_next: that.nextpoint
             }
+            
             axios.post('/netPointManage/processDelivery', d).then(res => {
                 res = res.data;
                 if (res.state == 200) {
                     alert("分配成功！");
                     that.centerVisible = false;
                     that.getDlv()
+                } else {
+                    alert(res.msg)
                 }
             })
         },

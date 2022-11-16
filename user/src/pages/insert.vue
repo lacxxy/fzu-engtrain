@@ -3,14 +3,14 @@
         <el-avatar class="avatarRecv"> 收 </el-avatar>
         <span class="title">收件人</span>
         <el-row :gutter="20" class="demo-autocomplete">
-            <el-col :span="5">
+            <el-col :span="6">
                 <div class="sub-title">
                     <span class="redstar">*</span>
                     姓名
                 </div>
                 <el-input v-model="recv.name" placeholder="请输入收件人姓名" />
             </el-col>
-            <el-col :span="5">
+            <el-col :span="6">
                 <div class="sub-title">
                     联系方式
                 </div>
@@ -18,14 +18,14 @@
             </el-col>
         </el-row>
         <el-row :gutter="20" class="demo-autocomplete text-center">
-            <el-col :span="5">
+            <el-col :span="6">
                 <div class="sub-title">
                     所在地区
                 </div>
-                <el-cascader :options="options" v-model="selectedOptions" @change="handleChange">
+                <el-cascader placeholder="请选择所在地区" :options="options" v-model="selectedOptions" @change="handleChange">
                 </el-cascader>
             </el-col>
-            <el-col :span="5">
+            <el-col :span="6">
                 <div class="sub-title">
                     <span class="redstar">*</span>
                     详细地址
@@ -38,14 +38,14 @@
         <el-avatar class="avatarSend"> 寄 </el-avatar>
         <span class="title">寄件人</span>
         <el-row :gutter="20" class="demo-autocomplete">
-            <el-col :span="5">
+            <el-col :span="6">
                 <div class="sub-title">
                     <span class="redstar">*</span>
                     姓名
                 </div>
                 <el-input v-model="send.name" placeholder="请输入收件人姓名" />
             </el-col>
-            <el-col :span="5">
+            <el-col :span="6">
                 <div class="sub-title">
                     联系方式
                 </div>
@@ -53,14 +53,14 @@
             </el-col>
         </el-row>
         <el-row :gutter="20" class="demo-autocomplete text-center">
-            <el-col :span="5">
+            <el-col :span="6">
                 <div class="sub-title">
                     所在地区
                 </div>
-                <el-cascader :options="options" v-model="selectedOptions1" @change="handleChange">
+                <el-cascader placeholder="请选择所在地区" :options="options" v-model="selectedOptions1" @change="handleChange">
                 </el-cascader>
             </el-col>
-            <el-col :span="5">
+            <el-col :span="6">
                 <div class="sub-title">
                     <span class="redstar">*</span>
                     详细地址
@@ -68,7 +68,7 @@
                 <el-input v-model="addr1" placeholder="请输入详细地址" />
             </el-col>
         </el-row>
-        <el-button @click="sendDil">寄出</el-button>
+        <el-button class="btn" type="primary" @click="sendDil">寄出</el-button>
     </div>
 </template>
 <script>
@@ -149,6 +149,8 @@ export default {
                 if (res.state == 200) {
                     alert("寄出成功!");
                     window.location.reload()
+                }else{
+                    alert(res.msg);
                 }
             })
         }
@@ -190,4 +192,5 @@ export default {
 .redstar {
     color: red;
 }
+
 </style>

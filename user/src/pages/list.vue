@@ -12,38 +12,54 @@
             <el-button type="primary" @click="search">查询</el-button>
         </div>
 
-
-        <el-table v-if="activeName == 0" size="large" :data="tableData" style="width: 100%" max-height="300px">
-            <el-table-column fixed prop="r_name" label="收件人" />
+        <el-table v-if="activeName == 0" size="large" :data="tableData.slice(5 * (page1 - 1), 5 * page1)"
+            style="width: 100%" max-height="300px">
+            <el-table-column fixed prop="s_name" label="寄件人" />
             <el-table-column prop="status" :formatter="formatState" label="快递状态" />
+            <el-table-column prop="now_point_name" label="当前所在网点" />
             <el-table-column prop="package_order_id" label="快递单号" />
-            <el-table-column prop="create_time" :formatter="formatTime" label="发货时间" />
+            <el-table-column prop="create_time" :formatter="formatTime" label="创建时间" />
             <el-table-column fixed="right" label="操作">
                 <template #default="scope">
-                    <el-button link type="primary" size="small" @click.prevent="showdetail(scope.$index)">
+                    <el-button link type="primary" size="small"
+                        @click.prevent="showdetail(5 * (page1 - 1) + scope.$index)">
                         详情
                     </el-button>
-                    <el-button v-if="tableData[scope.$index].status == 2" link type="danger" size="small"
-                        @click.prevent="signFor(scope.$index)">
+                    <el-button v-if="tableData[5 * (page1 - 1) + scope.$index].status == 2" link type="danger"
+                        size="small" @click.prevent="signFor(s5 * (page1 - 1) + scope.$index)">
                         签收
                     </el-button>
                 </template>
             </el-table-column>
         </el-table>
 
+        <el-pagination style="margin-top:25px" v-if="activeName == 0" background layout="prev, pager, next"
+            :total="tableData.length" :page-size="5" v-model:current-page="page1" />
+
+
+
+
+
+
         <el-table v-if="activeName == 1" size="large" :data="sendData" style="width: 100%" max-height="300px">
             <el-table-column fixed prop="r_name" label="收件人" />
             <el-table-column prop="status" :formatter="formatState" label="快递状态" />
+            <el-table-column prop="now_point_name" label="当前所在网点" />
             <el-table-column prop="package_order_id" label="快递单号" />
-            <el-table-column prop="create_time" :formatter="formatTime" label="发货时间" />
+            <el-table-column prop="create_time" :formatter="formatTime" label="创建时间" />
             <el-table-column fixed="right" label="操作">
                 <template #default="scope">
-                    <el-button link type="primary" size="small" @click.prevent="showdetail(scope.$index)">
+                    <el-button link type="primary" size="small"
+                        @click.prevent="showdetail(5 * (page2 - 1) + scope.$index)">
                         详情
                     </el-button>
                 </template>
             </el-table-column>
         </el-table>
+        <el-pagination style="margin-top:25px" v-if="activeName == 1" background layout="prev, pager, next"
+            :total="sendData.length" :page-size="5" v-model:current-page="page2" />
+
+
 
         <el-dialog v-model="centerDialogVisible" width="600px" align-center>
             <el-descriptions title="快递详情" direction="vertical" :column="3" :size="size" border>
@@ -54,7 +70,7 @@
                 <el-descriptions-item label="收件人电话">{{ message.r_tel }}</el-descriptions-item>
                 <el-descriptions-item label="收件地址">{{ message.r_addr }}</el-descriptions-item>
                 <el-descriptions-item label="快递编号">{{ message.package_order_id }}</el-descriptions-item>
-                <el-descriptions-item label="发货时间">{{ formatTime(0, 0, message.create_time) }}</el-descriptions-item>
+                <el-descriptions-item label="创建时间">{{ formatTime(0, 0, message.create_time) }}</el-descriptions-item>
             </el-descriptions>
         </el-dialog>
     </div>
@@ -72,6 +88,8 @@ export default {
             message: {},
             activeName: '0',
             order_id: '',
+            page1: 1,
+            page2: 1,
             tableData: [
             ],
             sendData: [

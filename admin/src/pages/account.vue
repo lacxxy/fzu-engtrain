@@ -12,19 +12,12 @@
             <span>{{ tel }}</span>
         </div>
         <div class="item">
-            <span class="title">邮箱</span>
+            <span class="title" @click="editorChange(2)">邮箱</span>
             <span>：</span>
             <span v-show="!editor.email" @click="editorChange(2)">{{ email }}</span>
             <el-input ref="emailEdit" v-model="email" v-show="editor.email" style="width:200px" @blur="postChange(2)" />
         </div>
-        <div class="item">
-            <el-select v-model="netpoint" placeholder="请选择网点">
-                <el-option v-for="item in options" :key="item.net_point_id" :label="item.address" :value="item.net_point_id" />
-            </el-select>
-            <span class="title">
-                <el-button type="primary" @click="register">网点注册</el-button>
-            </span>
-        </div>
+
         <div class="item">
             <span class="title">
                 <el-button type="danger" @click="exit">退出登录</el-button>

@@ -5,33 +5,44 @@
             <el-tab-pane label="我的揽件" name="1"></el-tab-pane>
         </el-tabs>
 
-        <el-table v-if="activeName == 0" size="large" :data="tableData" style="width: 100%" max-height="400px">
+        <el-table v-if="activeName == 0" size="large" :data="tableData.slice(5 * (page1 - 1), 5 * page1)"
+            style="width: 100%" max-height="400px">
             <el-table-column fixed prop="recvNmae" label="收件人" />
-            <el-table-column prop="status" :formatter="formatState" label="快递状态" />
-            <el-table-column prop="package_order_id" label="快递单号" />
+            <el-table-column prop="net_point_id_now" label="当前网点" />
+            <el-table-column prop="net_point_id_next" label="下一网点" />
+            <el-table-column prop="delivery_order_id" label="运单号" />
             <el-table-column prop="create_time" :formatter="formatTime" label="发货时间" />
             <el-table-column fixed="right" label="操作">
                 <template #default="scope">
-                    <el-button link type="primary" size="small" @click.prevent="takeDlv(scope.$index)">
+                    <el-button link type="primary" size="small"
+                        @click.prevent="takeDlv(5 * (page1 - 1) + scope.$index)">
                         揽件
                     </el-button>
                 </template>
             </el-table-column>
         </el-table>
+        <el-pagination style="margin-top:25px" v-if="activeName == 0" background layout="prev, pager, next"
+            :total="tableData.length" :page-size="5" v-model:current-page="page1" />
 
-        <el-table v-if="activeName == 1" size="large" :data="myData" style="width: 100%" max-height="400px">
+
+        <el-table v-if="activeName == 1" size="large" :data="myData.slice(5 * (page2 - 1), 5 * page2)"
+            style="width: 100%" max-height="400px">
             <el-table-column prop="recvNmae" label="收件人" />
-            <el-table-column prop="status" :formatter="formatState" label="快递状态" />
+            <el-table-column prop="net_point_id_now" label="当前网点" />
+            <el-table-column prop="net_point_id_next" label="下一网点" />
             <el-table-column prop="package_order_id" label="快递单号" />
+            <el-table-column prop="delivery_order_id" label="运单号" />
             <el-table-column prop="create_time" :formatter="formatTime" label="发货时间" />
             <el-table-column fixed="right" label="操作">
                 <template #default="scope">
-                    <el-button link type="danger" size="small" @click.prevent="confirm(scope.$index)">
+                    <el-button link type="danger" size="small" @click.prevent="confirm(5 * (page2 - 1) + scope.$index)">
                         妥投
                     </el-button>
                 </template>
             </el-table-column>
         </el-table>
+        <el-pagination style="margin-top:25px" v-if="activeName == 1" background layout="prev, pager, next"
+            :total="myData.length" :page-size="5" v-model:current-page="page2" />
     </div>
 </template>
 <script>
@@ -44,20 +55,8 @@ export default {
             poststate: '',
             sendtime: '',
             activeName: '0',
-            options: [
-                {
-                    value: '0',
-                    label: '全部',
-                },
-                {
-                    value: '1',
-                    label: '未发货',
-                },
-                {
-                    value: '2',
-                    label: '已发货',
-                },
-            ],
+            page1: 1,
+            page2: 1,
             tableData: [
 
             ],
@@ -97,7 +96,8 @@ export default {
                 delivery_order_id: that.myData[i].delivery_order_id
             }).then(res => {
                 res = res.data;
-                alert(res.msg)
+                alert(res.msg);
+                that.getTaken()
             })
         },
         finishDelivery(i) {
