@@ -26,7 +26,7 @@
                         详情
                     </el-button>
                     <el-button v-if="tableData[5 * (page1 - 1) + scope.$index].status == 2" link type="danger"
-                        size="small" @click.prevent="signFor(s5 * (page1 - 1) + scope.$index)">
+                        size="small" @click.prevent="signFor(5 * (page1 - 1) + scope.$index)">
                         签收
                     </el-button>
                 </template>

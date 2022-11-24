@@ -83,7 +83,7 @@ export default {
     }
   },
   mounted() {
-    axios.defaults.baseURL = 'http://10.133.4.254:8080/';
+    axios.defaults.baseURL = 'http://127.0.0.1:8080/';
     /*axios.interceptors.request.use(function (config) {
       let url = config.url.split('/').at(-1);
       if ((localStorage.cookie == 'null' || localStorage.cookie == "") && (url != 'login' && url != 'register')) {

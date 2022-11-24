@@ -11,8 +11,10 @@
         <el-table v-if="activeName == 0" size="large" :data="tableData" style="width: 100%" max-height="300px">
             <el-table-column fixed prop="user.name" label="账户名" />
             <el-table-column fixed prop="user.tel" label="手机号" />
-            <el-table-column fixed prop="now_sended_num" label="送达数量" />
-            <el-table-column fixed prop="now_wait_send_num" label="待送达数量" />
+            <el-table-column fixed prop="all_sended_num" label="总送达数量" />
+            <el-table-column fixed prop="all_wait_send_num" label="总待送达数量" />
+            <el-table-column fixed prop="now_sended_num" label="当前网点送达数量" />
+            <el-table-column fixed prop="now_wait_send_num" label="当前网点待送达数量" />
             <el-table-column fixed prop="user.email" label="邮箱" />
         </el-table>
         <el-table v-if="activeName == 1" size="large" :data="applyData" style="width: 100%" max-height="300px">

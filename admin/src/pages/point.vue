@@ -61,7 +61,7 @@ export default {
             const that = this;
             axios.post('/sendman/registerNetpoint', {
                 cookie: localStorage.cookie_admin,
-                net_point_id: that.tableData[i].net_point_id
+                net_point_id: that.tableData[i].netPoint.net_point_id
             }).then(res => {
                 res = res.data;
                 if (res.state == 200) {
