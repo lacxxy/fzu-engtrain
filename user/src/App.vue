@@ -2,32 +2,37 @@
   <div class="common-layout">
     <el-container style="height: 100%;">
       <el-header id="header">
-        <p id="logo">快递管家</p>
+        <p id="logo">闪电快递</p>
         <el-button text @click="centerDialogVisible = true" v-if="!iflogin">
           登录
         </el-button>
-        <span v-else>{{ username }}</span>
+        <span class="headimg" v-else><img src="./assets/man.png">{{ username }}</span>
       </el-header>
-      <el-container>
-        <el-aside id="side">
-          <el-menu :default-active="$route.path" :router="true" id="menu-top">
-            <router-link to="/insert">
-              <el-menu-item index="/insert">寄快递</el-menu-item>
-            </router-link>
-            <router-link to="/list">
-              <el-menu-item index="/list">我的快递</el-menu-item>
-            </router-link>
-            <router-link to="/account">
-              <el-menu-item index="/account">我的账户</el-menu-item>
-            </router-link>
-          </el-menu>
-        </el-aside>
 
+      <el-container class="main">
         <el-main>
           <router-view :changeIflogin="changeIflogin"></router-view>
         </el-main>
 
       </el-container>
+      <el-footer>
+
+        <el-menu class="bottom-menu" mode="horizontal" background-color="#FFFFFF"
+          :collapse-transition="false" :default-active="$route.path" :router="true" id="menu-top">
+          <router-link to="/insert">
+            <el-menu-item index="/insert">
+              寄快递
+            </el-menu-item>
+          </router-link>
+          <router-link to="/list">
+            <el-menu-item index="/list">快递</el-menu-item>
+          </router-link>
+          <router-link to="/account">
+            <el-menu-item index="/account">账户</el-menu-item>
+          </router-link>
+        </el-menu>
+
+      </el-footer>
     </el-container>
 
     <el-dialog v-model="centerDialogVisible" width="400px" align-center>
@@ -43,6 +48,7 @@
         </span>
       </template>
     </el-dialog>
+
 
     <el-dialog v-model="centerRegisterVisible" width="400px" align-center>
       <p class="login-title">注册</p>
@@ -83,18 +89,8 @@ export default {
     }
   },
   mounted() {
-    axios.defaults.baseURL = 'http://127.0.0.1:8080/';
-    /*axios.interceptors.request.use(function (config) {
-      let url = config.url.split('/').at(-1);
-      if ((localStorage.cookie == 'null' || localStorage.cookie == "") && (url != 'login' && url != 'register')) {
-        window.location.href = '/insert';
-        alert("请先登录！");
-      }
-      return config;
-    }, function (err) {
-      //请求错误之前可以进行处理
-      return Promise.reject(err)
-    });*/
+    axios.defaults.baseURL = 'http://10.133.0.36:8080/';
+    //axios.defaults.baseURL = 'http://127.0.0.1:8080/';
   },
   methods: {
     changeIflogin(val) {
@@ -158,44 +154,38 @@ export default {
 .common-layout {
   height: 100%;
 }
-
+.main{
+  overflow: scroll;
+}
 #logo {
   display: inline-block;
-  width: 15%;
+  width: 200px;
   font-size: 20px;
-  padding-left: 20px;
   display: flex;
   align-items: center;
 }
 
 #menu-top {
   flex: 1;
-  background-color: #dedede;
+  background-color: #ffffff;
 }
 
 #header {
   display: flex;
-  background-color: #dedede;
+  background-color: #ffffff;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 2px rgb(233, 233, 233) solid;
 }
 
 .el-menu-item.is-active {
-  background-color: #dedede !important;
+  background-color: #ffffff !important;
 }
 
-.el-menu-item:hover {
-  outline: 0 !important;
-  color: #409eff !important;
-  background: #dedede !important;
-}
 
-#side {
-  background-color: #dedede !important;
-}
-
-.el-menu {
-  background-color: #dedede !important;
+.bottom-menu{
+  display: flex;
+  justify-content: space-around;
 }
 
 a {
@@ -209,5 +199,13 @@ a {
 
 .login-ipt {
   margin-top: 20px;
+}
+.headimg {
+  display: flex;
+  align-items: center;
+  font-weight: bolder;
+}
+.headimg img{
+  width: 30px;
 }
 </style>

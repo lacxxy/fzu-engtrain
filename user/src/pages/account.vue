@@ -152,7 +152,7 @@ export default {
 </script>
 <style scoped>
 #AccountMes {
-    margin-left: 40px;
+   
 }
 
 .title {

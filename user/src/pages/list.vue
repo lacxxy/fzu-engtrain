@@ -4,60 +4,68 @@
             <el-tab-pane label="我收的" name="0"></el-tab-pane>
             <el-tab-pane label="我寄的" name="1"></el-tab-pane>
         </el-tabs>
+
         <div class="row">
-            <span class="sub-title">
-                快递单号
-            </span>
             <el-input v-model="order_id" class="ipt" placeholder="请输入单号" />
             <el-button type="primary" @click="search">查询</el-button>
         </div>
 
-        <el-table v-if="activeName == 0" size="large" :data="tableData.slice(5 * (page1 - 1), 5 * page1)"
-            style="width: 100%" max-height="300px">
-            <el-table-column fixed prop="s_name" label="寄件人" />
-            <el-table-column prop="status" :formatter="formatState" label="快递状态" />
-            <el-table-column prop="now_point_name" label="当前所在网点" />
-            <el-table-column prop="package_order_id" label="快递单号" />
-            <el-table-column prop="create_time" :formatter="formatTime" label="创建时间" />
-            <el-table-column fixed="right" label="操作">
-                <template #default="scope">
-                    <el-button link type="primary" size="small"
-                        @click.prevent="showdetail(5 * (page1 - 1) + scope.$index)">
-                        详情
-                    </el-button>
-                    <el-button v-if="tableData[5 * (page1 - 1) + scope.$index].status == 2" link type="danger"
-                        size="small" @click.prevent="signFor(5 * (page1 - 1) + scope.$index)">
-                        签收
-                    </el-button>
+        <div v-if="activeName == 0">
+            <el-card class="box-card" v-for="item, i in tableData" :key="item" @click="showdetail(i)">
+                <template #header>
+                    <div class="card-header">
+                        <span>运单号:{{ item.package_order_id }}</span>
+                    </div>
                 </template>
-            </el-table-column>
-        </el-table>
+                <div class="card-mes">
+                    <div class="card-main">
+                        <p class="card-area">{{ item.remark.split(',')[0] }}</p>
+                        <p class="card-name">{{ item.s_name }}</p>
+                    </div>
+                    <div class="card-img">
+                        <span :style="'color:' + formatClass(item.status)">{{ formatState(0, 0, item.status) }}</span>
+                        <img src="../assets/arrow.png">
+                    </div>
+                    <div class="card-main">
+                        <p class="card-area">{{ item.remark.split(',')[1] }}</p>
+                        <p class="card-name">{{ item.r_name }}</p>
+                    </div>
+                </div>
+                <p class="dlvState">当前网点：{{ item.now_point_name }}
+                </p>
+            </el-card>
 
-        <el-pagination style="margin-top:25px" v-if="activeName == 0" background layout="prev, pager, next"
-            :total="tableData.length" :page-size="5" v-model:current-page="page1" />
-
-
-
-
-
-
-        <el-table v-if="activeName == 1" size="large" :data="sendData" style="width: 100%" max-height="300px">
-            <el-table-column fixed prop="r_name" label="收件人" />
-            <el-table-column prop="status" :formatter="formatState" label="快递状态" />
-            <el-table-column prop="now_point_name" label="当前所在网点" />
-            <el-table-column prop="package_order_id" label="快递单号" />
-            <el-table-column prop="create_time" :formatter="formatTime" label="创建时间" />
-            <el-table-column fixed="right" label="操作">
-                <template #default="scope">
-                    <el-button link type="primary" size="small"
-                        @click.prevent="showdetail(5 * (page2 - 1) + scope.$index)">
-                        详情
-                    </el-button>
+        </div>
+        <div v-if="activeName == 1">
+            <el-card class="box-card" v-for="item, i in sendData" :key="item" @click="showdetail(i)">
+                <template #header>
+                    <div class="card-header">
+                        <span>运单号:{{ item.package_order_id }}</span>
+                    </div>
                 </template>
-            </el-table-column>
-        </el-table>
-        <el-pagination style="margin-top:25px" v-if="activeName == 1" background layout="prev, pager, next"
-            :total="sendData.length" :page-size="5" v-model:current-page="page2" />
+                <div class="card-mes">
+                    <div class="card-main">
+                        <p class="card-area">{{ item.remark.split(',')[0] }}</p>
+                        <p class="card-name">{{ item.s_name }}</p>
+                    </div>
+                    <div class="card-img">
+                        <span :style="'color:' + formatClass(item.status)">{{ formatState(0, 0, item.status) }}</span>
+                        <img src="../assets/arrow.png">
+                    </div>
+                    <div class="card-main">
+                        <p class="card-area">{{ item.remark.split(',')[1] }}</p>
+                        <p class="card-name">{{ item.r_name }}</p>
+                    </div>
+                </div>
+                <p class="dlvState">当前网点：{{ item.now_point_name }}
+                </p>
+            </el-card>
+
+        </div>
+
+
+
+
 
 
 
@@ -69,8 +77,12 @@
                 <el-descriptions-item label="收件人">{{ message.r_name }}</el-descriptions-item>
                 <el-descriptions-item label="收件人电话">{{ message.r_tel }}</el-descriptions-item>
                 <el-descriptions-item label="收件地址">{{ message.r_addr }}</el-descriptions-item>
-                <el-descriptions-item label="快递编号">{{ message.package_order_id }}</el-descriptions-item>
+                <el-descriptions-item label="单号">{{ message.package_order_id }}</el-descriptions-item>
                 <el-descriptions-item label="创建时间">{{ formatTime(0, 0, message.create_time) }}</el-descriptions-item>
+                <el-descriptions-item label="当前网点">{{ message.now_point_name }}</el-descriptions-item>
+                <el-descriptions-item label="备注">{{ message.detail }}</el-descriptions-item>
+                <el-descriptions-item label="重量">{{ message.weight }}</el-descriptions-item>
+                <el-descriptions-item label="备注">{{ message.price }}</el-descriptions-item>
             </el-descriptions>
         </el-dialog>
     </div>
@@ -122,6 +134,15 @@ export default {
                 res = '已签收'
             }
             return res;
+        },
+        formatClass(val) {
+            const obj = {
+                0: 'green',
+                1: 'blue',
+                2: 'green',
+                3: 'red',
+            }
+            return obj[val]
         },
         formatTime(row, column, cellValue) {
             let value = cellValue
@@ -196,7 +217,46 @@ export default {
     height: 100%;
 }
 
+.card-mes {
+    display: flex;
+    justify-content: space-around;
+}
+
+img {
+    width: 30px;
+}
+
+.dlvState {
+    text-align: center;
+    font-size: 14px;
+}
+
 .row {
-    margin: 15px 0;
+    display: flex;
+    margin: 5px 0;
+}
+
+.box-card {
+    margin: 10px 0;
+    background-color: rgb(205 230 247 / 20%);
+}
+
+.card-main {
+    text-align: center;
+}
+
+.card-img {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card-area {
+    font-weight: bolder;
+    font-size: 18px;
+}
+
+.card-name {
+    color: rgb(148, 147, 147);
 }
 </style>
