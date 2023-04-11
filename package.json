@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "js-cookie": "^3.0.1",
+    "vue-cookie": "^1.1.4",
+    "vue-cookies": "^1.8.3",
+    "vue3-cookies": "^1.0.6"
+  }
+}

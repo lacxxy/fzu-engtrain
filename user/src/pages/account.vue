@@ -11,12 +11,12 @@
             <span>：</span>
             <span>{{ tel }}</span>
         </div>
-        <div class="item">
+        <!---div class="item">
             <span class="title" @click="editorChange(2)">邮 箱</span>
             <span>：</span>
             <span v-show="!editor.email" @click="editorChange(2)">{{ email }}</span>
             <el-input ref="emailEdit" v-model="email" v-show="editor.email" style="width:200px" @blur="postChange(2)" />
-        </div>
+        </div-->
         <div class="item">
             <span class="title">
                 <el-button type="danger" @click="exit">退出登录</el-button>
@@ -27,7 +27,7 @@
         </div>
 
         <el-dialog v-model="centerDialogVisible" width="400px" align-center>
-            <el-input v-model="pass.old" class="ipt" placeholder="旧密码" />
+            <!--el-input v-model="pass.old" class="ipt" placeholder="旧密码" /-->
             <el-input v-model="pass.new" class="ipt" placeholder="新密码" />
             <el-button class="ipt" type="danger" @click="changePass">确认更改</el-button>
         </el-dialog>
@@ -35,11 +35,11 @@
 </template>
 <script>
 import axios from 'axios';
+import Cookies from 'js-cookie'
 export default {
     name: 'AccountMes',
     data() {
         return {
-            email: "",
             id_number: "",
             name: "",
             net_point_id: '',
@@ -49,7 +49,6 @@ export default {
             type: null,
             user_id: null,
             prename: '',
-            preemail: '',
             centerDialogVisible: false,
             pass: {
                 old: '',
@@ -69,24 +68,24 @@ export default {
     },
     methods: {
         exit() {
-            localStorage.cookie = 'null';
+            Cookies.remove("cookie")
+            Cookies.remove("user_name")
+            Cookies.remove("user_id");
             this.changeIflogin(false);
             window.location.reload()
         },
         getMes() {
             const that = this;
-            axios.post('/user/getInfo', {
-                cookie: localStorage.cookie
+            axios.post('/common/getInfo', {
+                user_id: Cookies.get('user_id')
             }).then(res => {
                 res = res.data;
-                let obj = res.obj;
-                that.email = obj.email;
-                that.id_number = obj.id_number;
-                that.name = obj.name;
-                that.tel = obj.tel;
+                that.id_number = res.user_id;
+                that.name = res.user_name;
+                that.tel = res.phone_number;
             })
         },
-        postChange(type) {
+        /*postChange(type) {
             if (this.preemail == this.email && this.prename == this.name) {
                 this.editor.name = false;
                 this.editor.email = false;
@@ -129,18 +128,18 @@ export default {
                     that.$refs.emailEdit.focus()
                 });
             }
-        },
+        },*/
         changePass() {
             const that = this;
             const d = {
-                cookie: localStorage.cookie,
-                old_password: that.pass.old,
-                new_password: that.pass.new,
+                user_id: Cookies.get('user_id'),
+                //old_password: that.pass.old,
+                password: that.pass.new,
             };
-            axios.post('/user/changePassword', d).then(res => {
+            axios.post('/common/changePassword', d).then(res => {
                 res = res.data;
                 if (res.state == 200) {
-                    alert(res.msg+"请重新登录");
+                    alert(res.msg);
                     that.centerDialogVisible = false;
                 }else{
                     alert(res.msg);

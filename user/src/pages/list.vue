@@ -1,94 +1,50 @@
 <template>
     <div id="ListView">
-        <el-tabs v-model="activeName" class="demo-tabs" @tab-change="handleClick">
-            <el-tab-pane label="我收的" name="0"></el-tab-pane>
-            <el-tab-pane label="我寄的" name="1"></el-tab-pane>
-        </el-tabs>
-
         <div class="row">
             <el-input v-model="order_id" class="ipt" placeholder="请输入单号" />
             <el-button type="primary" @click="search">查询</el-button>
         </div>
 
-        <div v-if="activeName == 0">
+        <div>
             <el-card class="box-card" v-for="item, i in tableData" :key="item" @click="showdetail(i)">
                 <template #header>
                     <div class="card-header">
-                        <span>运单号:{{ item.package_order_id }}</span>
+                        <span>{{ item.service.service_name }}服务</span>
                     </div>
                 </template>
-                <div class="card-mes">
-                    <div class="card-main">
-                        <p class="card-area">{{ item.remark.split(',')[0] }}</p>
-                        <p class="card-name">{{ item.s_name }}</p>
-                    </div>
-                    <div class="card-img">
-                        <span :style="'color:' + formatClass(item.status)">{{ formatState(0, 0, item.status) }}</span>
-                        <img src="../assets/arrow.png">
-                    </div>
-                    <div class="card-main">
-                        <p class="card-area">{{ item.remark.split(',')[1] }}</p>
-                        <p class="card-name">{{ item.r_name }}</p>
-                    </div>
+                <div>
+                    <span>{{ formatTime('', '', item.order_appoint_time_start) }}</span>
+                    <span>~</span>
+                    <span>{{ formatTime('', '', item.order_appoint_time_end) }}</span>
                 </div>
-                <p class="dlvState">当前网点：{{ item.now_point_name }}
-                </p>
+                <div>
+                    <span :style="'color:' + formatClass(item.order_status)">{{ formatState('', '', item.order_status)
+                    }}</span>
+                </div>
             </el-card>
 
         </div>
-        <div v-if="activeName == 1">
-            <el-card class="box-card" v-for="item, i in sendData" :key="item" @click="showdetail(i)">
-                <template #header>
-                    <div class="card-header">
-                        <span>运单号:{{ item.package_order_id }}</span>
-                    </div>
-                </template>
-                <div class="card-mes">
-                    <div class="card-main">
-                        <p class="card-area">{{ item.remark.split(',')[0] }}</p>
-                        <p class="card-name">{{ item.s_name }}</p>
-                    </div>
-                    <div class="card-img">
-                        <span :style="'color:' + formatClass(item.status)">{{ formatState(0, 0, item.status) }}</span>
-                        <img src="../assets/arrow.png">
-                    </div>
-                    <div class="card-main">
-                        <p class="card-area">{{ item.remark.split(',')[1] }}</p>
-                        <p class="card-name">{{ item.r_name }}</p>
-                    </div>
-                </div>
-                <p class="dlvState">当前网点：{{ item.now_point_name }}
-                </p>
-            </el-card>
-
-        </div>
-
-
-
-
-
 
 
         <el-dialog v-model="centerDialogVisible" width="600px" align-center>
-            <el-descriptions title="快递详情" direction="vertical" :column="3" :size="size" border>
-                <el-descriptions-item label="寄件人">{{ message.s_name }}</el-descriptions-item>
-                <el-descriptions-item label="寄件人电话">{{ message.s_tel }}</el-descriptions-item>
-                <el-descriptions-item label="寄件地址">{{ message.s_addr }}</el-descriptions-item>
-                <el-descriptions-item label="收件人">{{ message.r_name }}</el-descriptions-item>
-                <el-descriptions-item label="收件人电话">{{ message.r_tel }}</el-descriptions-item>
-                <el-descriptions-item label="收件地址">{{ message.r_addr }}</el-descriptions-item>
-                <el-descriptions-item label="单号">{{ message.package_order_id }}</el-descriptions-item>
-                <el-descriptions-item label="创建时间">{{ formatTime(0, 0, message.create_time) }}</el-descriptions-item>
-                <el-descriptions-item label="当前网点">{{ message.now_point_name }}</el-descriptions-item>
-                <el-descriptions-item label="备注">{{ message.detail }}</el-descriptions-item>
-                <el-descriptions-item label="重量">{{ message.weight }}</el-descriptions-item>
-                <el-descriptions-item label="备注">{{ message.price }}</el-descriptions-item>
+            <el-descriptions title="服务详情" direction="vertical" :column="3" :size="size" border>
+                <el-descriptions-item label="服务">{{ message.service.service_name }}</el-descriptions-item>
+                <el-descriptions-item label="地址">{{ message.order_addr }}</el-descriptions-item>
+                <el-descriptions-item label="预约开始时间">{{ formatTime(0, 0, message.order_appoint_time_start)
+                }}</el-descriptions-item>
+                <el-descriptions-item label="预约结束时间">{{ formatTime(0, 0, message.order_appoint_time_end)
+                }}</el-descriptions-item>
+                <el-descriptions-item label="评价">{{ message.order_estimation }}</el-descriptions-item>
+                <el-descriptions-item label="单号">{{ message.order_id }}</el-descriptions-item>
+                <el-descriptions-item label="订单状态">{{ formatState(0, 0, message.order_status) }}</el-descriptions-item>
+                <el-descriptions-item label="家政员编号">{{ message.serviceman_id }}</el-descriptions-item>
             </el-descriptions>
         </el-dialog>
     </div>
 </template>
 <script>
 import axios from 'axios';
+import Cookies from 'js-cookie'
 export default {
     name: 'ListView',
     data() {
@@ -103,35 +59,50 @@ export default {
             page1: 1,
             page2: 1,
             tableData: [
-            ],
-            sendData: [
-            ]
+                {
+                    "order_actual_time_end": 1680623568000,
+                    "order_actual_time_start": 1680623543000,
+                    "order_addr": "福建省福州市福州大学旗山校区",
+                    "order_appoint_time_end": 0,
+                    "order_appoint_time_start": 1680623543000,
+                    "order_estimation": "好",
+                    "order_extra_user_demand": "无",
+                    "order_id": 3,
+                    "order_reject_reason": "",
+                    "order_star": 9,
+                    "order_status": "3",
+                    "service": {
+                        "service_id": 4,
+                        "service_img": "/img/家庭搬家.jpg",
+                        "service_name": "家庭搬家",
+                        "service_process": "1.专业的客服人员为您的搬家服务估价\n2.由专业的搬家顾问为您上门测量记录所需要打包收纳和搬运的物品尺寸，以便在搬家时给您带来合适尺寸的收纳和打包工具\n3.在搬家顾问给您测量需要搬迁打包的物品后为您参考合适的搬家套餐\n4.熊猫搬团队为您的物品进行专业的打包和收纳\n5.专业的搬家工人为您的物品进行运输搬迁\n6.熊猫搬会提供专业的保洁服务，给您的新家做一次保洁清洗服务\n7.熊猫搬在为您服务完成后会对您进行满意度电话回访保证我们服务质量的改善",
+                        "service_status": 1,
+                        "service_type": 9,
+                        "user_id": 10
+                    },
+                    "serviceman_id": 12,
+                    "user_id": 8
+                },
+                { "order_addr": "福建省福州市福州大学旗山校区", "order_appoint_time_end": 0, "order_appoint_time_start": 0, "order_estimation": "", "order_extra_user_demand": "要求半价", "order_id": 4, "order_reject_reason": "无法半价", "order_star": 0, "order_status": "3", "service": { "service_id": 4, "service_img": "/img/家庭搬家.jpg", "service_name": "家庭搬家", "service_process": "1.专业的客服人员为您的搬家服务估价\n2.由专业的搬家顾问为您上门测量记录所需要打包收纳和搬运的物品尺寸，以便在搬家时给您带来合适尺寸的收纳和打包工具\n3.在搬家顾问给您测量需要搬迁打包的物品后为您参考合适的搬家套餐\n4.熊猫搬团队为您的物品进行专业的打包和收纳\n5.专业的搬家工人为您的物品进行运输搬迁\n6.熊猫搬会提供专业的保洁服务，给您的新家做一次保洁清洗服务\n7.熊猫搬在为您服务完成后会对您进行满意度电话回访保证我们服务质量的改善", "service_status": 1, "service_type": 9, "user_id": 10 }, "user_id": 8 }]
         }
     },
     created() {
         this.getRecv();
     },
     methods: {
-        handleClick(i) {
-            if (i == 0) {
-                this.getRecv();
-            } else if (i == 1) {
-                this.getSend();
-            }
-        },
         formatState(row, column, cellValue) {
             let res = '';
             if (cellValue == 0) {
-                res = '待处理'
+                res = '已下单'
             }
             else if (cellValue == 1) {
-                res = '运输中'
+                res = '已分配家政员'
             }
             else if (cellValue == 2) {
-                res = '已送达'
+                res = '家政员服务中'
             }
             else if (cellValue == 3) {
-                res = '已签收'
+                res = '服务结束'
             }
             return res;
         },
@@ -155,25 +126,20 @@ export default {
                 MM = MM < 10 ? ('0' + MM) : MM
                 let d = date.getDate() // 日
                 d = d < 10 ? ('0' + d) : d
-                return y + '-' + MM + '-' + d
+                let h = date.getHours() // 小时
+                h = h < 10 ? ('0' + h) : h;
+                let s = date.getSeconds() // 秒
+                s = s < 10 ? ('0' + s) : s;
+                return y + '年' + MM + '月' + d + '日' + h + ':' + s;
             }
         },
         getRecv() {
             const that = this;
-            axios.post('/user/searchRecvParcel', {
-                cookie: localStorage.cookie
+            axios.post('/user/getMyOrder', {
+                user_id: Cookies.get('user_id')
             }).then(res => {
                 res = res.data;
-                that.tableData = res.objs;
-            })
-        },
-        getSend() {
-            const that = this;
-            axios.post('/user/searchSendParcel', {
-                cookie: localStorage.cookie
-            }).then(res => {
-                res = res.data;
-                that.sendData = res.objs;
+                that.tableData = res;
             })
         },
         showdetail(i) {
@@ -181,29 +147,6 @@ export default {
             this.message = d[i];
             this.centerDialogVisible = true
         },
-        search() {
-            const that = this;
-            axios.post('/user/getParcelInfo', { package_order_id: that.order_id }).then(res => {
-                res = res.data;
-                if (res.state == 200) {
-                    that.message = res.obj;
-                    that.centerDialogVisible = true;
-                }
-                else {
-                    alert("无此快递或服务器错误")
-                }
-            })
-        },
-        signFor(i) {
-            const that = this;
-            axios.post('/user/signPackage', {
-                package_order_id: that.tableData[i].package_order_id
-            }).then(res => {
-                res = res.data;
-                alert(res.msg);
-                that.getRecv()
-            })
-        }
     },
 }
 </script>

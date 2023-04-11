@@ -1,203 +1,140 @@
 <template>
     <div id="insert">
-        <el-form :model="send" label-width="120px">
 
-            <p class="insert-title">寄件人信息：</p>
-            <div class="row">
-                <el-input size="middle" class="ipt" v-model="send.name" placeholder="请输入寄件人的名字"></el-input>
-                <el-input size="middle" class="ipt" v-model="send.phone" placeholder="请输入寄件人的电话号码"></el-input>
-            </div>
-
-
-
-            <div class="row">
-                <el-select @change="handleChangeProvince" v-model="selectedOptions[0]" class="ipt" placeholder="省"
-                    size="middle">
-                    <el-option v-for="item, i in options" :key="i" :label="item.label" :value="item.value" />
-                </el-select>
-
-                <el-select @change="handleChangeCity" v-model="selectedOptions[1]" class="ipt" placeholder="市"
-                    size="middle">
-                    <el-option v-for="item in options[index1[0]].children" :key="item" :label="item.label"
-                        :value="item.value" />
-                </el-select>
-
-                <el-select v-model="selectedOptions[2]" class="ipt" placeholder="县" size="middle">
-                    <el-option v-for="item in (options[index1[0]].children)[index1[1]].children" :key="item"
-                        :label="item.label" :value="item.value" />
-                </el-select>
-                <el-input size="middle" class="ipt" v-model="addr" placeholder="请输入寄件人的详细地址"></el-input>
-            </div>
-
-
-            <p class="insert-title">收件人信息：</p>
-
-            <div class="row">
-                <el-input size="middle" class="ipt" v-model="recv.name" placeholder="请输入收件人的名字"></el-input>
-                <el-input size="middle" class="ipt" v-model="recv.phone" placeholder="请输入收件人的电话号码"></el-input>
-            </div>
-
-
-
-            <div class="row">
-                <el-select @change="handleChangeProvince1" v-model="selectedOptions1[0]" class="ipt" placeholder="省"
-                    size="middle">
-                    <el-option v-for="item, i in options" :key="i" :label="item.label" :value="item.value" />
-                </el-select>
-
-                <el-select @change="handleChangeCity1" v-model="selectedOptions1[1]" class="ipt" placeholder="市"
-                    size="middle">
-                    <el-option v-for="item in options[index2[0]].children" :key="item" :label="item.label"
-                        :value="item.value" />
-                </el-select>
-
-                <el-select v-model="selectedOptions1[2]" class="ipt" placeholder="县" size="middle">
-                    <el-option v-for="item in (options[index2[0]].children)[index2[1]].children" :key="item"
-                        :label="item.label" :value="item.value" />
-                </el-select>
-                <el-input size="middle" class="ipt" v-model="addr1" placeholder="请输入收件人的详细地址"></el-input>
+        <div id="main-insert">
+            <div class="card-div" v-for="item in serveType" :key="item.value">
+                <i></i>
+                <span>{{ item.label }}</span>
+                <a @click="choose(item.value)">
+                    <img src="http://www.51ejz.com/images/index-icon-1.png">
+                    <img src="http://www.51ejz.com/images/index-icon-3-1.png">
+                </a>
 
             </div>
+        </div>
 
-            <span>重量：</span>
-            <el-input-number v-model="weight" min="0" />
-            <p class="insert-title">备注：</p>
+        <el-dialog v-model="centerDialogVisible" width="600px" align-center>
+            <el-form :model="send" label-width="120px">
+                <el-select v-model="serve_type" placeholder="请选择服务" size="middle">
+                    <el-option v-for="item in options" :key="item.key" :label="item.label" :value="item.key" />
+                </el-select>
 
-            <div class="row">
-                <el-input v-model="supplyMes" type="textarea" placeholder="补充..."></el-input>
-            </div>
+                <p class="insert-title">服务目的地：</p>
+                <div class="row">
+                    <el-input size="middle" v-model="addr" placeholder="请输入服务的目的地"></el-input>
+                </div>
 
-            <el-button style="margin-top:5px" @click="sendDil">提交</el-button>
+                <p class="insert-title">服务预约时间：</p>
 
+                <div class="row">
+                    <el-date-picker v-model="serve_time" type="datetimerange" range-separator="To" start-placeholder="开始时间"
+                        end-placeholder="结束时间" />
+                </div>
 
+                <p class="insert-title">备注：</p>
 
-        </el-form>
+                <div class="row">
+                    <el-input v-model="supplyMes" type="textarea" placeholder="补充..."></el-input>
+                </div>
+
+                <el-button style="margin-top:16px" @click="sendDil">提交</el-button>
+            </el-form>
+        </el-dialog>
     </div>
 </template>
 <script>
-import { regionData, CodeToText } from 'element-china-area-data'
+
 import axios from 'axios'
+import Cookies from 'js-cookie'
+import common from '../../common'
 export default {
     name: 'InsertNew',
     data() {
         return {
-            options: regionData,
-            test1: '广东省',
-            selectedOptions: [],
-            selectedOptions1: [],
+            options: [
+
+            ],
+            serve_type: null,
             addr: '',
-            addr1: '',
+            serve_time: null,
             supplyMes: '',
-            index1: [0, 0, 0],
-            index2: [0, 0, 0],
-            weight: 0,
-            price: 0,
-            send: {
-                name: "",
-                phone: "",
-                area: {
-                    "l1": "",
-                    "l2": "",
-                    "l3": "",
-                    "l4": ""
-                }
-            },
-            recv: {
-                name: "",
-                phone: "",
-                area: {
-                    "l1": "",
-                    "l2": "",
-                    "l3": "",
-                    "l4": ""
-                }
-            }
+            centerDialogVisible: false,
+            serveType: [
+            ]
         }
     },
+    created() {
+        //this.getServeType()
+        this.serveType=common.serverList
+    },
     methods: {
-        handleChangeProvince(value) {
-            let proNum = this.options.findIndex((item) => {
-                return item.value == value
-            })
-            this.selectedOptions[1]="";
-            this.index1[0] = proNum;
-        },
-        handleChangeCity(value) {
-            let proNum = this.options[this.index1[0]].children.findIndex((item) => {
-                return item.value == value
-            })
-            this.selectedOptions[2] = "";
-            this.index1[1] = proNum;
-        },
-        handleChangeProvince1(value) {
-            let proNum = this.options.findIndex((item) => {
-                return item.value == value
-            })
-            this.selectedOptions1[1]="";
-            this.index2[0] = proNum;
-        },
-        handleChangeCity1(value) {
-            let proNum = this.options[this.index2[0]].children.findIndex((item) => {
-                return item.value == value
-            })
-            this.selectedOptions1[2] = "";
-            this.index2[1] = proNum;
-        },
-        getPrice() {
+        // getServeType() {
+        //     const that = this;
+        //     axios.get('/service/getAllClass').then(res => {
+        //         res = res.data;
+        //         for (let index in res) {
+        //             that.serveType.push(
+        //                 {
+        //                     label: index,
+        //                     value: res[index]
+        //                 }
+        //             )
+        //         }
+        //     });
+        // },
+        choose(item) {
+            this.options = []
+            this.serve_type = null
+            this.centerDialogVisible = true;
+            console.log(item);
             const that = this;
-            return axios.post('/cost/calculate', {
-                start_addr: CodeToText[that.selectedOptions[0]] + CodeToText[that.selectedOptions[1]] + CodeToText[that.selectedOptions[2]] + that.addr,
-                end_addr: CodeToText[that.selectedOptions1[0]] + CodeToText[that.selectedOptions1[1]] + CodeToText[that.selectedOptions1[2]] + that.addr1,
-                weight: that.weight
-            })
+            axios.post('/service/getByType', {
+                field: item
+            }).then(res => {
+                res = res.data;
+                for (let index in res) {
+                    that.options.push(
+                        {
+                            key: res[index].service_id,
+                            label: res[index].service_name,
+                            value: res[index]
+                        }
+                    )
+                }
+            });
+            console.log(this.options)
         },
         async sendDil() {
-            let recvl1 = CodeToText[this.selectedOptions1[0]];
-            let recvl2 = CodeToText[this.selectedOptions1[1]];
-            let recvl3 = CodeToText[this.selectedOptions1[2]];
-            let sendl1 = CodeToText[this.selectedOptions[0]];
-            let sendl2 = CodeToText[this.selectedOptions[1]];
-            let sendl3 = CodeToText[this.selectedOptions[2]];
-            if (this.send.name == "" || this.addr == "" || this.addr1 == "" || this.recv.name == "") {
+            const that = this;
+            if (!this.serve_time) {
                 alert("无法为空");
                 return;
             }
-            const that = this;
-            let price=(await that.getPrice()).data.cost;
-            const data = {
-                cookie: localStorage.cookie,
-                send: {
-                    name: that.send.name,
-                    phone: that.send.phone,
-                    area: {
-                        l1: sendl1,
-                        l2: sendl2,
-                        l3: sendl3,
-                        l4: that.addr
-                    }
-                },
-                receive: {
-                    name: that.recv.name,
-                    phone: that.recv.phone,
-                    area: {
-                        l1: recvl1,
-                        l2: recvl2,
-                        l3: recvl3,
-                        l4: that.addr1
-                    }
-                },
-                detail: that.supplyMes,
-                weight: that.weight,
-                price: price
+            let begin_time = this.serve_time[0].getTime();
+            let end_time = this.serve_time[1].getTime();
+            const d = {
+                order_addr: this.addr,
+                order_extra_user_demand: this.supplyMes,
+                order_appoint_time_start: begin_time,
+                order_appoint_time_end: end_time,
+                user_id: Cookies.get('user_id'),
+                service_id: this.serve_type
             }
-            console.log(data)
-            axios.post('/user/sendParcel', data).then(res => {
+            for (let key in d) {
+                console.log(d[key])
+                if (d[key] == undefined || d[key] == "" || d[key] == null) {
+                    alert("错误");
+                    return;
+                }
+            }
+            axios.post('/user/createOrder', d).then(res => {
                 res = res.data;
+                alert(res.msg);
                 if (res.state == 200) {
-                    alert("寄出成功!");
-                    window.location.reload()
-                } else {
-                    alert(res.msg);
+                    that.serve_type = null;
+                    that.addr = '';
+                    that.serve_time = null;
+                    that.supplyMes = '';
                 }
             })
         }
@@ -211,8 +148,53 @@ export default {
     height: 100%;
 }
 
-.ipt {
-    margin: 10px 0;
+#main-insert {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.card-div {
+    margin: 20px;
+    padding: 5px;
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-div:hover {
+    background-color: #f2f2f2;
+}
+
+.card-div i {
+    display: block;
+    width: 45px;
+    height: 2px;
+    background-color: #FF7124;
+    margin-bottom: 10px;
+}
+
+.card-div span {
+    height: 40px;
+    color: #FF7124;
+    font-size: 20px;
+}
+
+.card-div img {
+    width: 25px;
+    height: 25px;
+}
+
+.card-div img:last-child {
+    display: none;
+}
+
+a:hover img:last-child {
+    display: block;
+    cursor: pointer;
+}
+
+a:hover img:first-child {
+    display: none;
 }
 
 .el-cascader-panel {
@@ -226,6 +208,10 @@ export default {
 }
 
 .insert-title {
-    margin-bottom: 10px;
+    margin: 16px 0;
+}
+.el-picker-panel__body-wrapper{
+    height: 150px;
+    overflow: scroll;
 }
 </style>
