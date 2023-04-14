@@ -1,9 +1,9 @@
 <template>
     <div id="ListView">
-        <div class="row">
+        <!-- <div class="row">
             <el-input v-model="order_id" class="ipt" placeholder="请输入单号" />
             <el-button type="primary" @click="search">查询</el-button>
-        </div>
+        </div> -->
 
         <div>
             <el-card class="box-card" v-for="item, i in tableData" :key="item" @click="showdetail(i)">
@@ -17,10 +17,13 @@
                     <span>~</span>
                     <span>{{ formatTime('', '', item.order_appoint_time_end) }}</span>
                 </div>
-                <div>
+                <div class="end-btn">
                     <span :style="'color:' + formatClass(item.order_status)">{{ formatState('', '', item.order_status)
                     }}</span>
+                    <el-button v-if="item.order_status == 2"
+                        @click.stop="this.centerStarVisible = true; this.select_id = item.order_id">服务结束</el-button>
                 </div>
+
             </el-card>
 
         </div>
@@ -40,6 +43,14 @@
                 <el-descriptions-item label="家政员编号">{{ message.serviceman_id }}</el-descriptions-item>
             </el-descriptions>
         </el-dialog>
+
+        <el-dialog v-model="centerStarVisible" width="400px" align-center>
+            <div class="star_area">
+                <el-input class="ipt" v-model="desc" clearable="true" placeholder="服务评价" />
+                <el-rate v-model="star" :max=10 />
+                <el-button class="ipt" @click="endService">结束服务</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -53,37 +64,15 @@ export default {
             poststate: '',
             sendtime: '',
             centerDialogVisible: false,
+            centerStarVisible: false,
             message: {},
             activeName: '0',
             order_id: '',
-            page1: 1,
-            page2: 1,
+            select_id: null,
+            star: 0,
+            desc: '',
             tableData: [
-                {
-                    "order_actual_time_end": 1680623568000,
-                    "order_actual_time_start": 1680623543000,
-                    "order_addr": "福建省福州市福州大学旗山校区",
-                    "order_appoint_time_end": 0,
-                    "order_appoint_time_start": 1680623543000,
-                    "order_estimation": "好",
-                    "order_extra_user_demand": "无",
-                    "order_id": 3,
-                    "order_reject_reason": "",
-                    "order_star": 9,
-                    "order_status": "3",
-                    "service": {
-                        "service_id": 4,
-                        "service_img": "/img/家庭搬家.jpg",
-                        "service_name": "家庭搬家",
-                        "service_process": "1.专业的客服人员为您的搬家服务估价\n2.由专业的搬家顾问为您上门测量记录所需要打包收纳和搬运的物品尺寸，以便在搬家时给您带来合适尺寸的收纳和打包工具\n3.在搬家顾问给您测量需要搬迁打包的物品后为您参考合适的搬家套餐\n4.熊猫搬团队为您的物品进行专业的打包和收纳\n5.专业的搬家工人为您的物品进行运输搬迁\n6.熊猫搬会提供专业的保洁服务，给您的新家做一次保洁清洗服务\n7.熊猫搬在为您服务完成后会对您进行满意度电话回访保证我们服务质量的改善",
-                        "service_status": 1,
-                        "service_type": 9,
-                        "user_id": 10
-                    },
-                    "serviceman_id": 12,
-                    "user_id": 8
-                },
-                { "order_addr": "福建省福州市福州大学旗山校区", "order_appoint_time_end": 0, "order_appoint_time_start": 0, "order_estimation": "", "order_extra_user_demand": "要求半价", "order_id": 4, "order_reject_reason": "无法半价", "order_star": 0, "order_status": "3", "service": { "service_id": 4, "service_img": "/img/家庭搬家.jpg", "service_name": "家庭搬家", "service_process": "1.专业的客服人员为您的搬家服务估价\n2.由专业的搬家顾问为您上门测量记录所需要打包收纳和搬运的物品尺寸，以便在搬家时给您带来合适尺寸的收纳和打包工具\n3.在搬家顾问给您测量需要搬迁打包的物品后为您参考合适的搬家套餐\n4.熊猫搬团队为您的物品进行专业的打包和收纳\n5.专业的搬家工人为您的物品进行运输搬迁\n6.熊猫搬会提供专业的保洁服务，给您的新家做一次保洁清洗服务\n7.熊猫搬在为您服务完成后会对您进行满意度电话回访保证我们服务质量的改善", "service_status": 1, "service_type": 9, "user_id": 10 }, "user_id": 8 }]
+            ]
         }
     },
     created() {
@@ -147,6 +136,26 @@ export default {
             this.message = d[i];
             this.centerDialogVisible = true
         },
+        async endService() {
+            const that = this;
+            if (this.desc == "" || this.star == 0) {
+                alert("不能为空");
+                return;
+            }
+            let res = await axios.post('/user/endService', {
+                order_id: that.select_id
+            });
+            if (res.data.state != 200) {
+                alert(res.msg);
+                return;
+            }
+            res = await axios.post('/user/starAndEstimation', {
+                order_id: that.select_id,
+                order_star: that.star,
+                order_estimation: that.desc
+            });
+            alert(res.data.msg);
+        },
     },
 }
 </script>
@@ -201,5 +210,22 @@ img {
 
 .card-name {
     color: rgb(148, 147, 147);
+}
+
+.end-btn {
+    display: flex;
+    margin: 10px 0;
+    justify-content: space-between;
+}
+
+.star_area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ipt {
+    width: 80%;
+    margin: 10px 0;
 }
 </style>

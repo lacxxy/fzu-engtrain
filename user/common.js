@@ -1,5 +1,5 @@
 module.exports = {
-    baseUrl: 'http://10.133.11.170:8080',
+    baseUrl: 'http://10.133.52.143:8080',
     serverList: [
         {
             value: '0',

@@ -2,7 +2,7 @@
   <div class="common-layout">
     <el-container style="height: 100%;">
       <el-header id="header">
-        <p id="logo">闪电快递</p>
+        <p id="logo">闪电家政</p>
         <el-button text @click="centerDialogVisible = true" v-if="!iflogin">
           登录
         </el-button>
@@ -13,25 +13,38 @@
         <el-aside width="200px">
           <el-menu class="bottom-menu" mode="vertical" background-color="#FFFFFF" :collapse-transition="false"
             :default-active="$route.path" :router="true" id="menu-top">
-            <router-link to="/insert">
-              <el-menu-item index="/insert">
-                下单服务
-              </el-menu-item>
-            </router-link>
+            <div v-if="ifuser">
+              <router-link to="/insert">
+                <el-menu-item index="/insert">
+                  下单服务
+                </el-menu-item>
+              </router-link>
+              <router-link to="/list">
+                <el-menu-item index="/list">列表</el-menu-item>
+              </router-link>
+            </div>
+            <div v-if="ifcompany">
+              <router-link to="/serverPush">
+                <el-menu-item index="/serverPush">发布服务</el-menu-item>
+              </router-link>
+              <router-link to="/serverList">
+                <el-menu-item index="/serverList">服务列表</el-menu-item>
+              </router-link>
+              <router-link to="/serverManList">
+                <el-menu-item index="/serverManList">家政员列表</el-menu-item>
+              </router-link>
+              <router-link to="/orderList">
+                <el-menu-item index="/orderList">订单列表</el-menu-item>
+              </router-link>
+            </div>
 
-            <router-link to="/serverPush">
-              <el-menu-item index="/serverPush">发布服务</el-menu-item>
-            </router-link>
-            <router-link to="/serverList">
-              <el-menu-item index="/serverList">服务列表</el-menu-item>
-            </router-link>
-            <router-link to="/serverManList">
-              <el-menu-item index="/serverManList">家政员列表</el-menu-item>
-            </router-link>
-
-            <router-link to="/list">
-              <el-menu-item index="/list">列表</el-menu-item>
-            </router-link>
+            <div v-if="ifserverman">
+              <router-link to="/orderList">
+                <el-menu-item index="/orderList">
+                  我的订单
+                </el-menu-item>
+              </router-link>
+            </div>
             <router-link to="/account">
               <el-menu-item index="/account">账户</el-menu-item>
             </router-link>
@@ -97,6 +110,12 @@ export default {
   computed: {
     ifcompany() {
       return Cookies.get('type') == 2
+    },
+    ifuser() {
+      return Cookies.get('type') == 1
+    },
+    ifserverman() {
+      return Cookies.get('type') == 3
     }
   },
   data() {
