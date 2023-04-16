@@ -204,6 +204,7 @@ export default {
             this.detail = d;
             this.detail.type_name = commmon.serverList[d.service_type]
             this.detail.service_img = commmon.baseUrl + d.service_img
+            console.log(this.detail.service_img)
             this.centerDialogVisible = true
         },
         onlineService(id) {

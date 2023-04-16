@@ -14,6 +14,8 @@
 
                     <el-button link type="primary" size="small" @click="begin_server(scope.$index, scope.row)"
                         v-if="scope.row.order_status == 1 && ifServerman">开始服务</el-button>
+
+                    <el-button link type="primary" size="small" @click="openChat(scope.row)">发起聊天</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -75,12 +77,15 @@ export default {
         this.gettableData();
     },
     methods: {
+        openChat(r) {
+            this.$store.commit('newChat', r)
+            this.$router.push('/chat')
+        },
         handelMan(val) {
             this.serveManId = val;
         },
-        formatStatus(row, column, cellValue, index) {
-            console.log(row, column, index)
-            console.log(cellValue)
+        formatStatus(row, column, cellValue) {
+
             const obj = ['订单创建', '分配家政员', '家政员开始服务', '结束服务']
             return obj[cellValue]
         },

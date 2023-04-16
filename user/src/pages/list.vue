@@ -20,8 +20,13 @@
                 <div class="end-btn">
                     <span :style="'color:' + formatClass(item.order_status)">{{ formatState('', '', item.order_status)
                     }}</span>
-                    <el-button v-if="item.order_status == 2"
-                        @click.stop="this.centerStarVisible = true; this.select_id = item.order_id">服务结束</el-button>
+                    <div>
+                        <el-button @click.stop="contact(item.service.company)">联系公司</el-button>
+                        <el-button @click.stop="contact(item.serviceman)">联系家政员</el-button>
+                        <el-button v-if="item.order_status == 2" type="danger"
+                            @click.stop="this.centerStarVisible = true; this.select_id = item.order_id">服务结束</el-button>
+                    </div>
+
                 </div>
 
             </el-card>
@@ -79,6 +84,12 @@ export default {
         this.getRecv();
     },
     methods: {
+        contact(r) {
+            let d={};
+            d.user=r;
+            this.$store.commit('newChat', d)
+            this.$router.push('/chat')
+        },
         formatState(row, column, cellValue) {
             let res = '';
             if (cellValue == 0) {

@@ -45,6 +45,10 @@
                 </el-menu-item>
               </router-link>
             </div>
+
+            <router-link to="/chat">
+              <el-menu-item index="/chat">聊天</el-menu-item>
+            </router-link>
             <router-link to="/account">
               <el-menu-item index="/account">账户</el-menu-item>
             </router-link>
@@ -102,6 +106,7 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import common from '../common'
+
 export default {
   name: 'App',
   components: {
@@ -128,6 +133,7 @@ export default {
       iflogin: false,
       username: '',
       good_type: null,
+      phone_number: null,
       options: [
         {
           value: '1',
@@ -157,9 +163,12 @@ export default {
       },
     }
   },
+
   mounted() {
     axios.defaults.baseURL = common.baseUrl;
-    //axios.defaults.baseURL = 'https://ep27api.shawnxixi.icu'
+    if (Cookies.get('cookie')) {
+      this.$store.commit('initWebSocket', `ws://10.133.52.143:9090/webSocket/${Cookies.get('phone_number')}`)
+    }
     const that = this;
     axios.get('/service/getAllClass').then(res => {
       res = res.data;
@@ -173,7 +182,64 @@ export default {
       }
     })
   },
+
   methods: {
+    initWebSocket() {
+      var ws_on_line = `ws://10.133.52.143:9090/webSocket/${Cookies.get('phone_number')}`
+      console.log('111111111111', ws_on_line)
+      // var ws_scheme = window.location.protocol==="https:"?"wss":"ws"      
+      this.websock = new WebSocket(ws_on_line);
+      this.websock.onopen = this.websocketonopen;
+      this.websock.onmessage = this.websocketonmessage;
+      this.websock.onerror = this.websocketonerror;
+      // this.websock.onclose = this.websocketclose;   
+    },
+    websocketonopen() {
+      //连接建立之后执行send方法发送数据     
+      console.log("建立连接");
+      var actions = { message: "连接测试" };
+      this.sendMessage(actions);
+    },
+
+    websocketonerror(e) {
+      //连接建立失败重连      
+      console.log("连接error", e);
+      // this.initWebSocket();
+    },
+
+    websocketonmessage(e) {
+      //数据接收      
+      this.websocket_data = JSON.parse(e.data);
+      console.log("websocket-res", JSON.stringify(this.websocket_data))
+      console.log("接收后端数据type", typeof (this.websocket_data))
+      // 将websocket消息展示在消息提示框     
+      var h = this.$createElement;
+      // 创建html元素      
+      this.hrender = h("p", null, [
+        h(
+          "div", [
+          h("div",
+            JSON.stringify(this.websocket_data.message)),
+          // 传变量           
+          //   },         
+          // }),           
+        ],
+          null
+        ),
+      ]);
+
+    },
+    sendMessage(Data) {
+      //数据发送     
+      this.websock.send(JSON.stringify(Data));
+    },
+    websocketclose(e) {  //关闭      
+      console.log('断开连接', e);
+    },
+    closeConn() {
+      //socket.close(); // 向服务端发送断开连接的请求
+    },
+
     changeIflogin(val) {
       this.iflogin = val;
     },
@@ -201,12 +267,14 @@ export default {
             Cookies.remove("user_name")
             Cookies.remove("user_id");
             Cookies.remove("type");
+            Cookies.remove("phone_number")
           }
 
           Cookies.set("cookie", res.cookie);
           Cookies.set("user_name", res.user_name);
           Cookies.set("user_id", res.user_id);
           Cookies.set("type", res.type);
+          Cookies.set("phone_number", res.phone_number)
           this.iflogin = true;
           this.username = res.user_name;
           this.centerDialogVisible = false;

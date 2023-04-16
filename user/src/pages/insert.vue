@@ -1,23 +1,45 @@
 <template>
     <div id="insert">
+        <div id="search-area">
+            <div class="column-area">
+                <label>选择类别</label>
+                <el-select v-model="type" collapse-tags multiple placeholder="注册类型" size="middle" @change="changeType">
+                    <el-option v-for="item in serveType" :key="item.value" :label="item.label" :value="item.value" />
+                </el-select>
+            </div>
+            <div class="column-area">
+                <label>名称</label>
+                <el-input clearable v-model="search_name" @input="changeIpt"></el-input>
+            </div>
 
+        </div>
         <div id="main-insert">
-            <div class="card-div" v-for="item in serveType" :key="item.value">
+            <!-- <div class="card-div" v-for="item in serveType" :key="item.value">
                 <i></i>
                 <span>{{ item.label }}</span>
                 <a @click="choose(item.value)">
-                    <img src="http://www.51ejz.com/images/index-icon-1.png">
-                    <img src="http://www.51ejz.com/images/index-icon-3-1.png">
+                    <img src="../assets/arrow.png">
+                    <img src="../assets/arrow1.png">
                 </a>
 
-            </div>
+            </div> -->
+            <el-table :data="tableData" style="width: 100%" size="large" stripe="true">
+                <el-table-column fixed prop="service_id" label="服务id" width="100" />
+                <el-table-column prop="service_name" label="服务名称" width="150" />
+                <el-table-column prop="service_type" :formatter="formatType" label="服务类型" />
+                <el-table-column fixed="right" label="操作">
+                    <template #default="scope">
+                        <el-button link type="success" size="small"
+                            @click="showDetail(scope.$index, scope.row)">服务详情</el-button>
+                        <el-button @click="choose(scope.$index, scope.row)" link type="primary"
+                            size="small">下单服务</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
         </div>
 
         <el-dialog v-model="centerDialogVisible" width="600px" align-center>
-            <el-form :model="send" label-width="120px">
-                <el-select v-model="serve_type" placeholder="请选择服务" size="middle">
-                    <el-option v-for="item in options" :key="item.key" :label="item.label" :value="item.key" />
-                </el-select>
+            <el-form label-width="120px">
 
                 <p class="insert-title">服务目的地：</p>
                 <div class="row">
@@ -40,6 +62,20 @@
                 <el-button style="margin-top:16px" @click="sendDil">提交</el-button>
             </el-form>
         </el-dialog>
+
+        <el-dialog v-model="centerDetailVisible" width="600px" align-center>
+            <el-descriptions title="服务详情" direction="vertical" :column="3" :size="size" border>
+                <el-descriptions-item label="服务id">{{ showMes.service_id }}</el-descriptions-item>
+                <el-descriptions-item label="服务图片">
+                    <img class="server_img" v-bind:src="url + showMes.service_img">
+                </el-descriptions-item>
+                <el-descriptions-item label="服务名称">{{ showMes.service_name
+                }}</el-descriptions-item>
+                <el-descriptions-item label="服务描述">{{ showMes.service_process
+                }}</el-descriptions-item>
+
+            </el-descriptions>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -54,55 +90,73 @@ export default {
             options: [
 
             ],
-            serve_type: null,
+            url: null,
+            tableData: [],
             addr: '',
+            select_serverid: null,
             serve_time: null,
             supplyMes: '',
             centerDialogVisible: false,
+            centerDetailVisible: false,
             serveType: [
-            ]
+            ],
+            type: null,
+            showMes: null,
+            search_name: ''
         }
     },
     created() {
         //this.getServeType()
-        this.serveType=common.serverList
+        this.serveType = common.serverList
+        this.url = common.baseUrl
+        this.getAll()
     },
     methods: {
-        // getServeType() {
-        //     const that = this;
-        //     axios.get('/service/getAllClass').then(res => {
-        //         res = res.data;
-        //         for (let index in res) {
-        //             that.serveType.push(
-        //                 {
-        //                     label: index,
-        //                     value: res[index]
-        //                 }
-        //             )
-        //         }
-        //     });
-        // },
-        choose(item) {
-            this.options = []
-            this.serve_type = null
+        choose(i, r) {
             this.centerDialogVisible = true;
-            console.log(item);
+            this.select_serverid = r.service_id
+        },
+        changeIpt(e) {
             const that = this;
-            axios.post('/service/getByType', {
-                field: item
+            this.type = []
+            if (e.length == 0) {
+                this.getAll();
+                return;
+            }
+            axios.post('/service/getByName', {
+                service_name: e
             }).then(res => {
                 res = res.data;
-                for (let index in res) {
-                    that.options.push(
-                        {
-                            key: res[index].service_id,
-                            label: res[index].service_name,
-                            value: res[index]
-                        }
-                    )
-                }
-            });
-            console.log(this.options)
+                that.tableData = res;
+            })
+        },
+        changeType(e) {
+            this.search_name = ''
+            if (e.length == 0) {
+                this.getAll()
+                return;
+            }
+            const that = this;
+            axios.post('/service/getByType', {
+                field: e
+            }).then(res => {
+                res = res.data;
+                that.tableData = res
+            })
+        },
+        showDetail(i, r) {
+            this.showMes = r;
+            this.centerDetailVisible = true;
+        },
+        formatType(row, column, val) {
+            return this.serveType[val].label
+        },
+        getAll() {
+            const that = this;
+            axios.get('/service/getAll').then(res => {
+                res = res.data;
+                that.tableData = res
+            })
         },
         async sendDil() {
             const that = this;
@@ -118,7 +172,7 @@ export default {
                 order_appoint_time_start: begin_time,
                 order_appoint_time_end: end_time,
                 user_id: Cookies.get('user_id'),
-                service_id: this.serve_type
+                service_id: this.select_serverid
             }
             for (let key in d) {
                 console.log(d[key])
@@ -131,7 +185,7 @@ export default {
                 res = res.data;
                 alert(res.msg);
                 if (res.state == 200) {
-                    that.serve_type = null;
+                    that.select_serverid = null;
                     that.addr = '';
                     that.serve_time = null;
                     that.supplyMes = '';
@@ -169,19 +223,19 @@ export default {
     display: block;
     width: 45px;
     height: 2px;
-    background-color: #FF7124;
+    background-color: #409eff;
     margin-bottom: 10px;
 }
 
 .card-div span {
     height: 40px;
-    color: #FF7124;
+    color: #409eff;
     font-size: 20px;
 }
 
 .card-div img {
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
 }
 
 .card-div img:last-child {
@@ -203,6 +257,11 @@ a:hover img:first-child {
     max-width: 500px;
 }
 
+.server_img {
+    width: 80px;
+    height: 80px;
+}
+
 .el-cascader-menu {
     width: 200px !important;
 }
@@ -210,8 +269,29 @@ a:hover img:first-child {
 .insert-title {
     margin: 16px 0;
 }
-.el-picker-panel__body-wrapper{
-    height: 150px;
+
+.el-picker-panel__body-wrapper {
+    height: 300px;
     overflow: scroll;
+}
+
+#search-area {
+    display: flex;
+}
+
+.column-area {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+label {
+    min-width: 40px;
+    margin: 0 15px;
+}
+
+.el-input {
+    height: 30px;
 }
 </style>

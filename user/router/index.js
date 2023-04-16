@@ -7,6 +7,7 @@ import ServerPush from '../src/pages/server'
 import ServerList from '../src/pages/serverList'
 import ServerManList from '../src/pages/serverManList'
 import OrderList from '../src/pages/orderList'
+import ChatPage from '../src/pages/chat'
 // 1. 定义路由组件：这里直接用的对象数据，也可以导入其他组件。
 
 
@@ -20,6 +21,7 @@ const routes = [
     { path: '/serverList', component: ServerList },
     { path: '/serverManList', component: ServerManList },
     { path: '/orderList', component: OrderList },
+    { path: '/chat', component: ChatPage },
 ]
 
 // 3. 创建路由实例并传递 `routes` 配置。
