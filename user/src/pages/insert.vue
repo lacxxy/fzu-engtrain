@@ -24,7 +24,7 @@
 
             </div> -->
             <el-table :data="tableData" style="width: 100%" size="large" stripe="true">
-                <el-table-column fixed prop="service_id" label="服务id" width="100" />
+                <!-- <el-table-column fixed prop="service_id" label="服务id" width="100" /> -->
                 <el-table-column prop="service_name" label="服务名称" width="150" />
                 <el-table-column prop="service_type" :formatter="formatType" label="服务类型" />
                 <el-table-column fixed="right" label="操作">

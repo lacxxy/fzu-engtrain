@@ -18,7 +18,7 @@
             <div id="panel-body">
                 <div id="log-container">
                     <div v-for="item in chooseItem.message" :key="item" :class="getclassName(item.from)">
-                        <label class="text-info">{{ item.from }} {{ getdate(item.time) }}</label>
+                        <label class="text-info">{{ item.from_name }} {{ getdate(item.time) }}</label>
                         <div class="text-text">{{ item.text }}</div>
                     </div>
                 </div>
@@ -71,7 +71,7 @@ export default {
                 var hour = date.getHours();
                 var minutes = date.getMinutes();
                 var second = date.getSeconds();
-                return (year + "-" + month + "-" + date1 + "-" + ' ' + hour + ":" + minutes + ":" + second);
+                return (year + "-" + month + "-" + date1  + ' ' + hour + ":" + minutes + ":" + second);
             };
         }
     },

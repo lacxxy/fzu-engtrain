@@ -17,7 +17,8 @@
     "v-distpicker": "^2.0.8",
     "vue": "^3.2.13",
     "vue-router": "^4.1.6",
-    "vuex": "^4.1.0"
+    "vuex": "^4.1.0",
+    "echarts": "^5.4.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -40,7 +41,9 @@
     "parserOptions": {
       "parser": "@babel/eslint-parser"
     },
-    "rules": {}
+    "rules": {
+      "vue/no-v-model-argument":0
+    }
   },
   "browserslist": [
     "> 1%",

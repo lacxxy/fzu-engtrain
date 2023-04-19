@@ -39,14 +39,32 @@
             </div>
 
             <div v-if="ifserverman">
-              <router-link to="/orderList">
-                <el-menu-item index="/orderList">
+              <router-link to="/manageLog">
+                <el-menu-item index="/manageLog">
                   我的订单
                 </el-menu-item>
               </router-link>
             </div>
 
-            <router-link to="/chat">
+            <div v-if="ifadmin">
+              <router-link to="/manageLog">
+                <el-menu-item index="/manageLog">
+                  公司申请审核
+                </el-menu-item>
+              </router-link>
+              <router-link to="/employeeTable">
+                <el-menu-item index="/employeeTable">
+                  员工查询
+                </el-menu-item>
+              </router-link>
+              <router-link to="/statistics">
+                <el-menu-item index="/statistics">
+                  统计数据
+                </el-menu-item>
+              </router-link>
+            </div>
+
+            <router-link to="/chat" v-if="!ifadmin">
               <el-menu-item index="/chat">聊天</el-menu-item>
             </router-link>
             <router-link to="/account">
@@ -121,6 +139,9 @@ export default {
     },
     ifserverman() {
       return Cookies.get('type') == 3
+    },
+    ifadmin() {
+      return Cookies.get('type') == 0
     }
   },
   data() {
